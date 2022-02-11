@@ -2,10 +2,10 @@
 cmake_minimum_required(VERSION 3.5.1)
 
 # project name
-project(vanilla)
+project(nevresim)
 
 # set the C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 # /include as directory
 include_directories(include)
