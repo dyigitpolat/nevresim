@@ -1,5 +1,8 @@
 #pragma once
 
+#include <array>
+#include <numeric>
+
 #include "types.hpp"
 
 namespace nevresim {
