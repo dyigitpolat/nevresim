@@ -3,6 +3,7 @@
 #include <array>
 #include <ranges>
 #include <algorithm>
+#include <cstddef>
 
 #include "types.hpp"
 #include "neuron.hpp"

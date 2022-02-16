@@ -2,6 +2,7 @@
 
 #include <array>
 #include <numeric>
+#include <cstddef>
 
 #include "types.hpp"
 

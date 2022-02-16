@@ -1,5 +1,9 @@
 #pragma once
 
+#include <array>
+#include <utility>
+#include <cstddef>
+
 #include "constants.hpp"
 #include "types.hpp"
 #include "core.hpp"
