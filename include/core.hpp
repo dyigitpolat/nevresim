@@ -1,9 +1,14 @@
 #pragma once
 
+#include <array>
+#include <ranges>
+#include <algorithm>
+
 #include "types.hpp"
+#include "neuron.hpp"
 
 namespace nevresim {
-    
+
 template <
     std::size_t AxonCount,
     std::size_t NeuronCount,
