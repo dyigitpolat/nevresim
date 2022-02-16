@@ -23,7 +23,7 @@ if (MSVC)
     add_compile_options(/W4 /WX)
 else ()
     # lots of warnings and all warnings as errors
-    add_compile_options(-Wall -Wextra -pedantic -Werror)
+    add_compile_options(-Wall -Wextra -pedantic -Werror -O3)
 endif ()
 
 # compiles the files defined by SOURCES to generante the executable defined by PROJECT_NAME
