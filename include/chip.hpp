@@ -70,6 +70,10 @@ class Chip
             {
                 return chip.input_buffer_[source.neuron_];
             }
+            else if(source.core_ == k_no_connection)
+            {
+                return spike_t{};
+            }
             else
             {
                 return 
@@ -128,7 +132,12 @@ public:
             [] <core_id_t ...IDs>
             (Chip& chip_, std::index_sequence<IDs...>)
             {
-                (chip_.cores_[IDs].compute(get_input_for()(chip_, IDs)), ...);
+                std::array<std::array<spike_t, AxonCount>, CoreCount> 
+                    axons{};
+
+                ((axons[IDs] = get_input_for()(chip_, IDs)), ...);
+                (chip_.cores_[IDs].compute(axons[IDs]), ...);
+                
             } (chip, std::make_index_sequence<CoreCount>{});
         };
     }
