@@ -63,35 +63,40 @@ void test_single_core_chip()
     }
 }
 
-
 consteval auto generate_multi_core_chip()
 {
     constexpr std::size_t axon_count{3};
     constexpr std::size_t neuron_count{3};
-    constexpr std::size_t core_count{2};
+    constexpr std::size_t core_count{4};
     constexpr std::size_t input_size{3};
     constexpr std::size_t output_size{3};
-    constexpr nevresim::threshold_t threshold{2};
+    constexpr nevresim::threshold_t threshold{170};
     constexpr nevresim::membrane_leak_t leak{0};
 
     using Cfg = nevresim::ChipConfiguration<
         axon_count, core_count, output_size>;
+
     using Src = nevresim::SpikeSource;
     using Con = nevresim::CoreConnection<axon_count>;
+    
     using Neu = nevresim::Neuron<
         axon_count, threshold, leak>;
     using Core = nevresim::Core<
         axon_count, neuron_count, threshold>;
 
     constexpr nevresim::core_id_t in = nevresim::k_input_buffer_id;
+    constexpr nevresim::core_id_t off =  nevresim::k_no_connection;
 
     constexpr Cfg config{{
             //core connectivity info
             Con{{ Src{in,0}, Src{in,1}, Src{in,2} }},
-            Con{{ Src{0,2},  Src{0,0},  Src{0,1}  }}},
+            Con{{ Src{0,0},  Src{0,1},  Src{0,2}  }},
+            Con{{ Src{1,0},  Src{off,0},  Src{off,0}  }},
+            Con{{ Src{1,1},  Src{1,2},  Src{off,0}  }}
+            },
             
             //output buffer description
-            { Src{1,2}, Src{1,1}, Src{1,0} }
+            { Src{2,0}, Src{3,0}, Src{3,1} }
         };
 
         
@@ -102,8 +107,10 @@ consteval auto generate_multi_core_chip()
 
     constexpr Chip chip{{
             // weights
-            Core{{ Neu{{0,0,1}}, Neu{{0,1,1}}, Neu{{1,1,1}} }},
-            Core{{ Neu{{0,1,0}}, Neu{{1,0,0}}, Neu{{1,0,1}} }}
+            Core{{ Neu{{90,90,90}}, Neu{{90,90,90}}, Neu{{90,90,90}} }},
+            Core{{ Neu{{170,1,1}}, Neu{{1,170,1}}, Neu{{1,1,170}} }},
+            Core{{ Neu{{180,0,0}}, Neu{{0,0,0}}, Neu{{0,0,0}} }},
+            Core{{ Neu{{180,0,0}}, Neu{{0,180,0}}, Neu{{0,0,0}} }}
         }};
     
     return chip;
@@ -116,14 +123,19 @@ void test_multi_core_chip()
     std::array<nevresim::spike_t, 3> input{1,1,1};
     chip.feed_input_buffer(input);
     auto compute = chip.generate_compute();
-    compute(chip);
-    compute(chip);
+    auto read_output_buffer = chip.generate_read_output_buffer();
 
-    for(auto spike : chip.generate_read_output_buffer()(chip))
-    {
-        std::cout << static_cast<int> (spike); //expected 100
+    for(auto i : {0,1,2,3,4,5,6}){
+        (void) i;
+        compute(chip);
+        for(auto spike : read_output_buffer(chip))
+        {
+            std::cout << static_cast<int> (spike); //expected 100
+        }
+        std::cout << "\n";
     }
 }
+
 
 int main()
 {
