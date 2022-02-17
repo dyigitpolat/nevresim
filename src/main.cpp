@@ -88,16 +88,15 @@ consteval auto generate_multi_core_chip()
     constexpr nevresim::core_id_t off =  nevresim::k_no_connection;
 
     constexpr Cfg config{{
-            //core connectivity info
-            Con{{ Src{in,0}, Src{in,1}, Src{in,2} }},
-            Con{{ Src{0,0},  Src{0,1},  Src{0,2}  }},
-            Con{{ Src{1,0},  Src{off,0},  Src{off,0}  }},
-            Con{{ Src{1,1},  Src{1,2},  Src{off,0}  }}
-            },
-            
-            //output buffer description
-            { Src{2,0}, Src{3,0}, Src{3,1} }
-        };
+        //core connectivity info
+        Con{{ Src{in,0}, Src{in,1}, Src{in,2} }},
+        Con{{ Src{0,0},  Src{0,1},  Src{0,2}  }},
+        Con{{ Src{1,0},  Src{off,0},  Src{off,0}  }},
+        Con{{ Src{1,1},  Src{1,2},  Src{off,0}  }} },
+        
+        //output buffer description
+        { Src{2,0}, Src{3,0}, Src{3,1} }
+    };
 
         
     using Chip = nevresim::Chip<
@@ -106,12 +105,12 @@ consteval auto generate_multi_core_chip()
         output_size, threshold, config>;
 
     constexpr Chip chip{{
-            // weights
-            Core{{ Neu{{90,90,90}}, Neu{{90,90,90}}, Neu{{90,90,90}} }},
-            Core{{ Neu{{170,1,1}}, Neu{{1,170,1}}, Neu{{1,1,170}} }},
-            Core{{ Neu{{180,0,0}}, Neu{{0,0,0}}, Neu{{0,0,0}} }},
-            Core{{ Neu{{180,0,0}}, Neu{{0,180,0}}, Neu{{0,0,0}} }}
-        }};
+        // weights
+        Core{{ Neu{{90,90,90}}, Neu{{90,90,90}}, Neu{{90,90,90}} }},
+        Core{{ Neu{{170,1,1}}, Neu{{1,170,1}}, Neu{{1,1,170}} }},
+        Core{{ Neu{{180,0,0}}, Neu{{0,0,0}}, Neu{{0,0,0}} }},
+        Core{{ Neu{{180,0,0}}, Neu{{0,180,0}}, Neu{{0,0,0}} }}
+    }};
     
     return chip;
 }
