@@ -23,7 +23,10 @@ class Core
     neurons_array_t neurons_{};
     output_array_t output_spikes_{};
 
-public:    
+public:
+    constexpr 
+    Core() : neurons_{} {}
+
     constexpr 
     Core(neurons_array_t neurons) : neurons_(neurons) {}
 

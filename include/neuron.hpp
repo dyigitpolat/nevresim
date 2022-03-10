@@ -40,6 +40,9 @@ class Neuron
 
 public:
     constexpr 
+    Neuron() : weights_{} {}
+
+    constexpr 
     Neuron(weights_array_t weights) : weights_{weights} {}
 
     constexpr
