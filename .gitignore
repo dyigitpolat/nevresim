@@ -31,6 +31,9 @@
 *.out
 *.app
 
+# generated code
+include/generated/*
+
 # some clutter
 build/*
 .vscode/*
