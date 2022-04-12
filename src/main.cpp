@@ -5,6 +5,7 @@
 #include "neuron.hpp"
 #include "core.hpp"
 #include "chip.hpp"
+#include "generated/generate_chip.hpp"
 
 void test_single_core()
 {
@@ -135,6 +136,34 @@ void test_multi_core_chip()
     }
 }
 
+#include <fstream>
+
+void test_generated_chip()
+{
+    auto chip = nevresim::generate_chip();
+
+    std::ifstream weights_stream("include/generated/chip_weights.txt");
+    if(weights_stream.is_open())
+    {
+        weights_stream >> chip;
+    }
+
+    std::array<nevresim::spike_t, 784> input{};
+    chip.feed_input_buffer(input);
+    auto compute = chip.generate_compute();
+    auto read_output_buffer = chip.generate_read_output_buffer();
+
+    for(auto i : {0,1,2,3,4,5,6}){
+        (void) i;
+        compute(chip);
+        for(auto spike : read_output_buffer(chip))
+        {
+            std::cout << static_cast<int> (spike); //expected 100
+        }
+        std::cout << "\n";
+    }
+}
+
 
 int main()
 {
@@ -150,6 +179,7 @@ int main()
     main_menu.add_menu_item({test_single_core, "test single core"});
     main_menu.add_menu_item({test_single_core_chip, "test single core chip"});
     main_menu.add_menu_item({test_multi_core_chip, "test multi core chip"});
+    main_menu.add_menu_item({test_generated_chip, "test generated chip"});
     main_menu.show();
 
     return 0;

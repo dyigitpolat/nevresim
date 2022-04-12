@@ -4,6 +4,7 @@
 #include <ranges>
 #include <algorithm>
 #include <cstddef>
+#include <istream>
 
 #include "types.hpp"
 #include "neuron.hpp"
@@ -13,10 +14,11 @@ namespace nevresim {
 template <
     std::size_t AxonCount,
     std::size_t NeuronCount,
-    threshold_t Threshold>
+    threshold_t Threshold,
+    membrane_leak_t LeakAmount = 0>
 class Core
 {
-    using neuron_t = Neuron<AxonCount, Threshold>;
+    using neuron_t = Neuron<AxonCount, Threshold, LeakAmount>;
     using neurons_array_t = std::array<neuron_t, NeuronCount>;
     using output_array_t = std::array<spike_t, NeuronCount>;
 
@@ -43,6 +45,16 @@ public:
             neurons_, std::ranges::begin(output_spikes_),
             [&](auto& neuron) { return neuron.compute(incoming_spikes); }
         );
+    }
+
+    friend std::istream& operator>>(std::istream& weights_stream, Core& core)
+    {
+        for(auto& neuron : core.neurons_)
+        {
+            weights_stream >> neuron;
+        }
+
+        return weights_stream;
     }
 };
 

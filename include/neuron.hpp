@@ -3,6 +3,7 @@
 #include <array>
 #include <numeric>
 #include <cstddef>
+#include <istream>
 
 #include "types.hpp"
 
@@ -50,6 +51,17 @@ public:
     {
         leaky_integrate(incoming_spikes);
         return fire();
+    }
+
+    friend std::istream& operator>>(
+        std::istream& weights_stream, Neuron& neuron)
+    {
+        for(auto& weight : neuron.weights_)
+        {
+            weights_stream >> weight;
+        }
+
+        return weights_stream;
     }
 };
 

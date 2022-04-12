@@ -3,6 +3,7 @@
 #include <array>
 #include <utility>
 #include <cstddef>
+#include <istream>
 
 #include "constants.hpp"
 #include "types.hpp"
@@ -49,12 +50,14 @@ template<
     ChipConfiguration<
         AxonCount,
         CoreCount,
-        OutputSize> Configuration
+        OutputSize> Configuration,
+    membrane_leak_t LeakAmount = 0
     >
 class Chip
 {
     using cores_array_t = 
-        std::array< Core< AxonCount, NeuronCount, Threshold>, CoreCount>;
+        std::array< 
+            Core< AxonCount, NeuronCount, Threshold, LeakAmount>, CoreCount>;
     
     using input_buffer_t = 
         std::array< spike_t, InputSize>;
@@ -114,6 +117,9 @@ class Chip
 public:
     constexpr 
     Chip(cores_array_t cores) : cores_(cores) {}
+
+    constexpr 
+    Chip() : cores_{} {}
     
     constexpr 
     static auto generate_read_output_buffer()
@@ -145,6 +151,16 @@ public:
     void feed_input_buffer(const input_buffer_t& feed)
     {
         input_buffer_ = feed;
+    }
+
+    friend std::istream& operator>>(std::istream& weights_stream, Chip& chip)
+    {
+        for(auto& core : chip.cores_)
+        {
+            weights_stream >> core;
+        }
+
+        return weights_stream;
     }
 };
 
