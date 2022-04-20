@@ -47,6 +47,14 @@ public:
         );
     }
 
+    void reset()
+    {
+        for(auto& neuron : neurons_)
+        {
+            neuron.reset();
+        }
+    }
+
     friend std::istream& operator>>(std::istream& weights_stream, Core& core)
     {
         for(auto& neuron : core.neurons_)

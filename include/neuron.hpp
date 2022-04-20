@@ -53,6 +53,11 @@ public:
         return fire();
     }
 
+    void reset()
+    {
+        membrane_potential_ = 0;
+    }
+
     friend std::istream& operator>>(
         std::istream& weights_stream, Neuron& neuron)
     {

@@ -153,6 +153,14 @@ public:
         input_buffer_ = feed;
     }
 
+    void reset()
+    {
+        for(auto& core : cores_)
+        {
+            core.reset();
+        }
+    }
+
     friend std::istream& operator>>(std::istream& weights_stream, Chip& chip)
     {
         for(auto& core : chip.cores_)
