@@ -18,15 +18,14 @@ public:
     friend std::istream& operator>>(
         std::istream& stream, InputLoader& loader)
     {
-        weights_stream >> loader.target_;
-        weights_stream >> loader.batch_size_;
-        weights_stream >> loader.input_size_;
+        stream >> loader.target_;
+        stream >> loader.batch_size_;
+        stream >> loader.input_size_;
 
-        loader.input_.clear();
-        loader.input_.reserve(input_size);
+        loader.input_ = std::vector<raw_input_t>(loader.input_size_);
         for(auto& item : loader.input_)
         {
-            weights_stream >> item;
+            stream >> item;
         }
 
         return stream;
