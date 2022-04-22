@@ -11,11 +11,10 @@
 
 namespace nevresim {
 
-template <
-    std::size_t InputSize,
-    std::size_t SpikeTrainLength>
-class SpikeSource
+template <std::size_t InputSize>
+class SpikeGenerator
 {
+public:
     using spike_source_t = std::array<spike_t, InputSize>;
 
     static spike_source_t generate_spikes(
@@ -25,7 +24,9 @@ class SpikeSource
         static std::mt19937 engine(device());
 
         spike_source_t source{};
-        std::ranges::generate(loader.input_, source, 
+        std::transform(
+            std::cbegin(loader.input_), std::cend(loader.input_), 
+            std::begin(source), 
             [&](auto item)
             {
                 return static_cast<spike_t>(
