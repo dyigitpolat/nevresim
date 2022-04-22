@@ -46,7 +46,6 @@ template<
     std::size_t CoreCount,
     std::size_t InputSize,
     std::size_t OutputSize,
-    threshold_t Threshold,
     ChipConfiguration<
         AxonCount,
         CoreCount,
@@ -57,7 +56,7 @@ class Chip
 {
     using cores_array_t = 
         std::array< 
-            Core< AxonCount, NeuronCount, Threshold, LeakAmount>, CoreCount>;
+            Core< AxonCount, NeuronCount, LeakAmount>, CoreCount>;
     
     using input_buffer_t = 
         std::array< spike_t, InputSize>;

@@ -14,11 +14,10 @@ namespace nevresim {
 template <
     std::size_t AxonCount,
     std::size_t NeuronCount,
-    threshold_t Threshold,
     membrane_leak_t LeakAmount = 0>
 class Core
 {
-    using neuron_t = Neuron<AxonCount, Threshold, LeakAmount>;
+    using neuron_t = Neuron<AxonCount, LeakAmount>;
     using neurons_array_t = std::array<neuron_t, NeuronCount>;
     using output_array_t = std::array<spike_t, NeuronCount>;
 
