@@ -1,146 +1,58 @@
 #include "demo_menu.hpp"
 
 #include <iostream> 
+#include <ranges> 
+#include <fstream>
 
 #include "neuron.hpp"
 #include "core.hpp"
 #include "chip.hpp"
+#include "input_loader.hpp"
+#include "spike_generator.hpp"
+#include "chip_executor.hpp"
+
 #include "generated/generate_chip.hpp"
 
-void test_single_core()
+void print_prediction_summary(const auto& buffer)
 {
-    nevresim::Core<3,3,10> core{
-        std::array{
-            nevresim::Neuron<3,10>{std::array{1,2,3}},
-            nevresim::Neuron<3,10>{std::array{4,5,6}},
-            nevresim::Neuron<3,10>{std::array{7,8,9}}}
-    };
-
-    std::array<nevresim::spike_t, 3> input{1,1,0};
-
-    core.compute(input);
-
-    for(auto spike : core.get_output_spikes())
+    for(int q{}; auto x : buffer)
     {
-        std::cout << static_cast<int> (spike); //expected 001
+        std::cout << "[" << q++ << ": " << x << "] ";
     }
+    std::cout << "\n";
 }
 
-
-void test_single_core_chip()
+int argmax(const auto& buffer)
 {
-    constexpr nevresim::ChipConfiguration<3,1,3> config {
-        {nevresim::CoreConnection<3>{
-            std::array<nevresim::SpikeSource, 3>{
-                nevresim::SpikeSource{nevresim::k_input_buffer_id, 0},
-                nevresim::SpikeSource{nevresim::k_input_buffer_id, 1},
-                nevresim::SpikeSource{nevresim::k_input_buffer_id, 2}}
-        }},
-        {
-            std::array<nevresim::SpikeSource, 3>{
-                nevresim::SpikeSource{0, 0},
-                nevresim::SpikeSource{0, 1},
-                nevresim::SpikeSource{0, 2}}        
-        }
-    };
-
-    nevresim::Chip<3,3,1,3,3,10, config> chip {
-        std::array<nevresim::Core<3,3,10>, 1> {
-            nevresim::Core<3,3,10> {
-                std::array{
-                    nevresim::Neuron<3,10>{std::array{1,2,3}},
-                    nevresim::Neuron<3,10>{std::array{4,5,6}},
-                    nevresim::Neuron<3,10>{std::array{7,8,9}}}
-                }
-        }
-    };
-
-    std::array<nevresim::spike_t, 3> input{1,1,0};
-    chip.feed_input_buffer(input);
-    chip.generate_compute()(chip);
-    for(auto spike : chip.generate_read_output_buffer()(chip))
-    {
-        std::cout << static_cast<int> (spike); //expected 001
-    }
+    return std::distance(
+        buffer.begin(),
+        std::max_element(buffer.begin(), buffer.end()));
 }
 
-consteval auto generate_multi_core_chip()
+void report_and_advance(
+    int guess, int target, int idx, int& correct, int& total)
 {
-    constexpr std::size_t axon_count{3};
-    constexpr std::size_t neuron_count{3};
-    constexpr std::size_t core_count{4};
-    constexpr std::size_t input_size{3};
-    constexpr std::size_t output_size{3};
-    constexpr nevresim::threshold_t threshold{170};
-    constexpr nevresim::membrane_leak_t leak{0};
+    total++;
+    if(guess==target) correct++;
 
-    using Cfg = nevresim::ChipConfiguration<
-        axon_count, core_count, output_size>;
+    std::cout 
+        << idx << " guess: " << guess
+        << "\n";
 
-    using Src = nevresim::SpikeSource;
-    using Con = nevresim::CoreConnection<axon_count>;
-    
-    using Neu = nevresim::Neuron<
-        axon_count, threshold, leak>;
-    using Core = nevresim::Core<
-        axon_count, neuron_count, threshold>;
+    std::cout 
+        << idx << " target: " << target
+        << "\n";
 
-    constexpr nevresim::core_id_t in = nevresim::k_input_buffer_id;
-    constexpr nevresim::core_id_t off =  nevresim::k_no_connection;
+    std::cout << correct << "/" << total << "\n";
 
-    constexpr Cfg config{{
-        //core connectivity info
-        Con{{ Src{in,0}, Src{in,1}, Src{in,2} }},
-        Con{{ Src{0,0},  Src{0,1},  Src{0,2}  }},
-        Con{{ Src{1,0},  Src{off,0},  Src{off,0}  }},
-        Con{{ Src{1,1},  Src{1,2},  Src{off,0}  }} },
-        
-        //output buffer description
-        { Src{2,0}, Src{3,0}, Src{3,1} }
-    };
-
-        
-    using Chip = nevresim::Chip<
-        axon_count, neuron_count, 
-        core_count, input_size, 
-        output_size, threshold, config>;
-
-    constexpr Chip chip{{
-        // weights
-        Core{{ Neu{{90,90,90}}, Neu{{90,90,90}}, Neu{{90,90,90}} }},
-        Core{{ Neu{{170,1,1}}, Neu{{1,170,1}}, Neu{{1,1,170}} }},
-        Core{{ Neu{{180,0,0}}, Neu{{0,0,0}}, Neu{{0,0,0}} }},
-        Core{{ Neu{{180,0,0}}, Neu{{0,180,0}}, Neu{{0,0,0}} }}
-    }};
-    
-    return chip;
+    std::cout << "\n";
 }
-
-void test_multi_core_chip()
-{
-    auto chip = generate_multi_core_chip();
-
-    std::array<nevresim::spike_t, 3> input{1,1,1};
-    chip.feed_input_buffer(input);
-    auto compute = chip.generate_compute();
-    auto read_output_buffer = chip.generate_read_output_buffer();
-
-    for(auto i : {0,1,2,3,4,5,6}){
-        (void) i;
-        compute(chip);
-        for(auto spike : read_output_buffer(chip))
-        {
-            std::cout << static_cast<int> (spike); //expected 100
-        }
-        std::cout << "\n";
-    }
-}
-
-#include <fstream>
 
 void test_generated_chip()
 {
     auto chip = nevresim::generate_chip();
+    auto compute = chip.generate_compute();
+    auto read_output_buffer = chip.generate_read_output_buffer();
 
     std::ifstream weights_stream("include/generated/chip_weights.txt");
     if(weights_stream.is_open())
@@ -148,22 +60,35 @@ void test_generated_chip()
         weights_stream >> chip;
     }
 
-    std::array<nevresim::spike_t, 784> input{};
-    chip.feed_input_buffer(input);
-    auto compute = chip.generate_compute();
-    auto read_output_buffer = chip.generate_read_output_buffer();
+    int correct{};
+    int total{};
+    for(int idx = 0; idx < 50; ++idx)
+    {
+        nevresim::InputLoader loader{};
+        std::string fname = 
+            std::string{"inputs/inputs"} +
+            std::to_string(idx) +
+            std::string{".txt"};
 
-    for(auto i : {0,1,2,3,4,5,6}){
-        (void) i;
-        compute(chip);
-        for(auto spike : read_output_buffer(chip))
+        std::ifstream input_stream(fname);
+        if(input_stream.is_open())
         {
-            std::cout << static_cast<int> (spike); //expected 100
+            input_stream >> loader;
         }
-        std::cout << "\n";
-    }
-}
+        
+        auto buffer = 
+            nevresim::ChipExecutor<nevresim::SpikingExecution>::execute(
+                loader, chip, compute, read_output_buffer
+            );
 
+        chip.reset();
+
+        print_prediction_summary(buffer);
+        int guess = argmax(buffer);
+        report_and_advance(guess, loader.target_, idx, correct, total);
+    }
+    
+}
 
 int main()
 {
@@ -176,9 +101,6 @@ int main()
     //-----------------------------------------//
 
     DemoMenu main_menu("MAIN MENU");
-    main_menu.add_menu_item({test_single_core, "test single core"});
-    main_menu.add_menu_item({test_single_core_chip, "test single core chip"});
-    main_menu.add_menu_item({test_multi_core_chip, "test multi core chip"});
     main_menu.add_menu_item({test_generated_chip, "test generated chip"});
     main_menu.show();
 
