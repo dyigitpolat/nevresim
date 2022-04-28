@@ -114,6 +114,10 @@ class Chip
     }
 
 public:
+    static constexpr std::size_t input_size_{InputSize};
+    static constexpr std::size_t output_size_{OutputSize};
+
+public:
     constexpr 
     Chip(cores_array_t cores) : cores_(cores) {}
 
