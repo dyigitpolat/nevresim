@@ -33,6 +33,7 @@
 
 # generated code
 include/generated/*
+inputs/*
 
 # some clutter
 build/*
