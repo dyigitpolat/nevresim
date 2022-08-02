@@ -7,6 +7,7 @@
 
 namespace nevresim {
 
+template <int SimulationLength>
 class SpikingExecution
 {
 public:
@@ -17,9 +18,7 @@ public:
         const auto& output_buffer_read_function)
     {
         std::array<weight_t, chip.output_size_> buffer{};
-        for(auto i : std::views::iota(0, 2000)){
-            (void) i;
-
+        for(int i = 0; i < SimulationLength; ++i){
             chip.feed_input_buffer(
                 SpikeGenerator<chip.input_size_>::generate_spikes(loader));
 

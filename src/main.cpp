@@ -77,7 +77,7 @@ void test_generated_chip()
         }
         
         auto buffer = 
-            nevresim::ChipExecutor<nevresim::SpikingExecution>::execute(
+            nevresim::ChipExecutor<nevresim::SpikingExecution<2000>>::execute(
                 loader, chip, compute, read_output_buffer
             );
 
@@ -87,7 +87,6 @@ void test_generated_chip()
         int guess = argmax(buffer);
         report_and_advance(guess, loader.target_, idx, correct, total);
     }
-    
 }
 
 int main()
