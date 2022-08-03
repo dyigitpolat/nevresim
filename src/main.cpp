@@ -11,42 +11,9 @@
 #include "spike_generator.hpp"
 #include "chip_executor.hpp"
 
+#include "tests/all.hpp"
+
 #include "generated/generate_chip.hpp"
-
-void print_prediction_summary(const auto& buffer)
-{
-    for(int q{}; auto x : buffer)
-    {
-        std::cout << "[" << q++ << ": " << x << "] ";
-    }
-    std::cout << "\n";
-}
-
-int argmax(const auto& buffer)
-{
-    return std::distance(
-        buffer.begin(),
-        std::max_element(buffer.begin(), buffer.end()));
-}
-
-void report_and_advance(
-    int guess, int target, int idx, int& correct, int& total)
-{
-    total++;
-    if(guess==target) correct++;
-
-    std::cout 
-        << idx << " guess: " << guess
-        << "\n";
-
-    std::cout 
-        << idx << " target: " << target
-        << "\n";
-
-    std::cout << correct << "/" << total << "\n";
-
-    std::cout << "\n";
-}
 
 void test_generated_chip()
 {
@@ -77,15 +44,16 @@ void test_generated_chip()
         }
         
         auto buffer = 
-            nevresim::ChipExecutor<nevresim::SpikingExecution<2000>>::execute(
+            nevresim::ChipExecutor<nevresim::SpikingExecution<200>>::execute(
                 loader, chip, compute, read_output_buffer
             );
 
         chip.reset();
 
-        print_prediction_summary(buffer);
-        int guess = argmax(buffer);
-        report_and_advance(guess, loader.target_, idx, correct, total);
+        nevresim::tests::print_prediction_summary(buffer);
+        int guess = nevresim::tests::argmax(buffer);
+        nevresim::tests::report_and_advance(
+            guess, loader.target_, idx, correct, total);
     }
 }
 
@@ -100,6 +68,8 @@ int main()
     //-----------------------------------------//
 
     DemoMenu main_menu("MAIN MENU");
+    
+    main_menu.add_menu_item({nevresim::tests::run_all, "run all tests"});
     main_menu.add_menu_item({test_generated_chip, "test generated chip"});
     main_menu.show();
 
