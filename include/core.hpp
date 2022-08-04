@@ -47,6 +47,7 @@ public:
         );
     }
 
+    constexpr
     void reset()
     {
         for(auto& neuron : neurons_)
@@ -55,6 +56,7 @@ public:
         }
     }
 
+    constexpr
     void load_weights(const CoreWeights<NeuronCount, AxonCount>& weights)
     {
         for(

@@ -156,11 +156,13 @@ public:
         };
     }
 
+    constexpr
     void feed_input_buffer(const input_buffer_t& feed)
     {
         input_buffer_ = feed;
     }
 
+    constexpr
     void reset()
     {
         for(auto& core : cores_)
@@ -169,6 +171,7 @@ public:
         }
     }
 
+    constexpr
     void load_weights(
         const ChipWeights<CoreCount, NeuronCount, AxonCount>& weights)
     {

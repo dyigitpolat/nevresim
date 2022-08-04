@@ -7,7 +7,9 @@
 
 namespace nevresim {
 
-template <int SimulationLength>
+template <
+    int SimulationLength,
+    template<std::size_t InputSize> class SpikeProvider>
 class SpikingExecution
 {
 public:
@@ -20,7 +22,7 @@ public:
         std::array<weight_t, chip.output_size_> buffer{};
         for(int i = 0; i < SimulationLength; ++i){
             chip.feed_input_buffer(
-                SpikeGenerator<chip.input_size_>::generate_spikes(input));
+                SpikeProvider<chip.input_size_>::generate_spikes(input));
 
             compute_function(chip);
 

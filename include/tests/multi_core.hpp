@@ -5,6 +5,7 @@
 #include "chip.hpp"
 #include "input_loader.hpp"
 #include "weights_loader.hpp"
+#include "deterministic_spike_generator.hpp"
 
 #include "test_util.hpp"
 
@@ -43,7 +44,7 @@ consteval auto generate_outputs_3_cores_2x2()
     return outs;
 }
 
-bool test_3_core_2x2()
+constexpr bool test_3_core_2x2()
 {
     constexpr std::size_t axon_count{2};
     constexpr std::size_t neuron_count{2};
@@ -55,7 +56,7 @@ bool test_3_core_2x2()
     using Src = SpikeSource;
     using Con = CoreConnection<axon_count>;
 
-    constinit static auto chip = generate_test_chip<
+    auto chip = generate_test_chip<
         generate_connections_3_cores_2x2<Con, Src, core_count>(),
         generate_outputs_3_cores_2x2<Src, output_size>(),
         axon_count,
@@ -67,22 +68,29 @@ bool test_3_core_2x2()
     constexpr auto compute = chip.generate_compute();
     constexpr auto read_output_buffer = chip.generate_read_output_buffer();
 
-    WeightsLoader<core_count, neuron_count, axon_count> weights_loader{};
-    std::stringstream weights_stream(
-        "2 2 0 3 0 3 "
-        "1 2 0 3 0 3 "
-        "2 2 0 2 0 3 ");
-    if(weights_stream)
-    {
-        weights_stream >> weights_loader;
-    }
-
-    chip.load_weights(weights_loader.chip_weights_);
+    using ChipW = ChipWeights<core_count, neuron_count, axon_count>;
+    using CoreW = CoreWeights<neuron_count, axon_count>;
+    using NeurW = NeuronWeights<axon_count>;
+    using Ws = std::array<weight_t, axon_count>;
+    
+    ChipW weights{{
+        CoreW{{
+            NeurW{2, Ws{2,0}}, NeurW{3, Ws{0,3}}
+        }},
+        CoreW{{
+            NeurW{1, Ws{2,0}}, NeurW{3, Ws{0,3}}
+        }},
+        CoreW{{
+            NeurW{2, Ws{2,0}}, NeurW{2, Ws{0,3}}
+        }}
+    }};
+    chip.load_weights(weights);
 
     std::array<raw_input_t, 2> input{1.0, 1.0};
         
     auto buffer = 
-        nevresim::ChipExecutor<nevresim::SpikingExecution<12>>::execute(
+        ChipExecutor<SpikingExecution<12, DeterministicSpikeGenerator>>
+        ::execute(
             input, chip, compute, read_output_buffer
         );
 

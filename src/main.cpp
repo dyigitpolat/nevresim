@@ -50,7 +50,9 @@ void test_generated_chip()
         }
         
         auto buffer = 
-            nevresim::ChipExecutor<nevresim::SpikingExecution<200>>::execute(
+            nevresim::ChipExecutor<nevresim::SpikingExecution<
+                200, nevresim::SpikeGenerator
+                >>::execute(
                 input_loader.input_, chip, compute, read_output_buffer
             );
 

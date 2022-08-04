@@ -1,34 +1,22 @@
 #pragma once
 
-#include <array>
-#include <algorithm>
-#include <random>
-#include <cstddef>
-
 #include "constants.hpp"
 #include "types.hpp"
-#include "input_loader.hpp"
+#include "spike_generator.hpp"
+
+#include <algorithm>
 
 namespace nevresim {
 
-template <std::size_t InputSize>
-class SpikeGenerator
+template <std::size_t InputSize, raw_input_t Threshold = 0.5>
+class DeterministicSpikeGenerator
 {
 public:
     using spike_source_t = std::array<spike_t, InputSize>;
 
-    static spike_source_t generate_spikes(
-        const auto& input)
-    {
-        static std::random_device device;
-        static std::mt19937 engine(device());
-        
-        return generate_spikes(input, engine);
-    }
-
     constexpr
     static spike_source_t generate_spikes(
-        const auto& input, auto& random_engine)
+        const auto& input)
     {
         spike_source_t source{};
         std::transform(
@@ -37,8 +25,7 @@ public:
             [&](auto item)
             {
                 return static_cast<spike_t>(
-                    std::discrete_distribution({1.0-item, item})
-                    (random_engine)
+                    item > Threshold
                 );
             });
         

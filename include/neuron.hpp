@@ -54,11 +54,13 @@ public:
         return fire();
     }
 
+    constexpr
     void reset()
     {
         membrane_potential_ = 0;
     }
 
+    constexpr
     void load_weights(const NeuronWeights<AxonCount>& weights)
     {
         threshold_ = weights.threshold_;

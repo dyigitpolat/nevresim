@@ -10,6 +10,9 @@ namespace nevresim
 namespace tests
 {
 
+static_assert(test_single_core());
+static_assert(test_3_core_2x2());
+
 void report_result(auto title, auto test)
 {
     std::cout << title << ": ";
