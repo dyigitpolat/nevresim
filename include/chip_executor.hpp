@@ -12,7 +12,7 @@ class SpikingExecution
 {
 public:
     constexpr static auto execute(
-        const InputLoader& loader, 
+        const auto& input, 
         auto& chip,
         const auto& compute_function,
         const auto& output_buffer_read_function)
@@ -20,7 +20,7 @@ public:
         std::array<weight_t, chip.output_size_> buffer{};
         for(int i = 0; i < SimulationLength; ++i){
             chip.feed_input_buffer(
-                SpikeGenerator<chip.input_size_>::generate_spikes(loader));
+                SpikeGenerator<chip.input_size_>::generate_spikes(input));
 
             compute_function(chip);
 
@@ -42,13 +42,13 @@ class ChipExecutor
 {
 public:
     constexpr static auto execute(
-        const InputLoader& loader, 
+        const auto& input, 
         auto& chip,
         const auto& compute_function,
         const auto& output_buffer_read_function)
     {
         return ExecutePolicy::execute(
-            loader, chip, compute_function, output_buffer_read_function);
+            input, chip, compute_function, output_buffer_read_function);
     }
 };
 

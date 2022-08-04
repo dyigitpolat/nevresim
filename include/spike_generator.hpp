@@ -18,14 +18,14 @@ public:
     using spike_source_t = std::array<spike_t, InputSize>;
 
     static spike_source_t generate_spikes(
-        const InputLoader& loader)
+        const auto& input)
     {
         static std::random_device device;
         static std::mt19937 engine(device());
 
         spike_source_t source{};
         std::transform(
-            std::cbegin(loader.input_), std::cend(loader.input_), 
+            std::cbegin(input), std::cend(input), 
             std::begin(source), 
             [&](auto item)
             {

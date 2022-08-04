@@ -75,16 +75,11 @@ bool test_3_core_2x2()
         weights_stream >> chip;
     }
 
-    nevresim::InputLoader loader{};
-    std::stringstream input_stream("0 1 2 1.0 1.0");
-    if(input_stream)
-    {
-        input_stream >> loader;
-    }
+    std::array<raw_input_t, 2> input{1.0, 1.0};
         
     auto buffer = 
         nevresim::ChipExecutor<nevresim::SpikingExecution<12>>::execute(
-            loader, chip, compute, read_output_buffer
+            input, chip, compute, read_output_buffer
         );
 
     chip.reset();
