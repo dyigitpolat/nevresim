@@ -1,13 +1,14 @@
 #pragma once
 
+#include "chip_weights.hpp"
+#include "types.hpp"
+#include "neuron.hpp"
+
 #include <array>
 #include <ranges>
 #include <algorithm>
 #include <cstddef>
 #include <istream>
-
-#include "types.hpp"
-#include "neuron.hpp"
 
 namespace nevresim {
 
@@ -54,14 +55,14 @@ public:
         }
     }
 
-    friend std::istream& operator>>(std::istream& weights_stream, Core& core)
+    void load_weights(const CoreWeights<NeuronCount, AxonCount>& weights)
     {
-        for(auto& neuron : core.neurons_)
+        for(
+            auto neuron_iter = std::begin(weights.neurons_); 
+            auto& neuron : neurons_)
         {
-            weights_stream >> neuron;
+            neuron.load_weights(*neuron_iter++);
         }
-
-        return weights_stream;
     }
 };
 

@@ -1,11 +1,12 @@
 #pragma once
 
+#include "chip_weights.hpp"
+#include "types.hpp"
+
 #include <array>
 #include <numeric>
 #include <cstddef>
 #include <istream>
-
-#include "types.hpp"
 
 namespace nevresim {
 template <
@@ -58,16 +59,10 @@ public:
         membrane_potential_ = 0;
     }
 
-    friend std::istream& operator>>(
-        std::istream& weights_stream, Neuron& neuron)
+    void load_weights(const NeuronWeights<AxonCount>& weights)
     {
-        weights_stream >> neuron.threshold_;
-        for(auto& weight : neuron.weights_)
-        {
-            weights_stream >> weight;
-        }
-
-        return weights_stream;
+        threshold_ = weights.threshold_;
+        weights_ = weights.weights_;
     }
 };
 

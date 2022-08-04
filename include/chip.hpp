@@ -1,13 +1,14 @@
 #pragma once
 
+#include "weights_loader.hpp"
+#include "constants.hpp"
+#include "types.hpp"
+#include "core.hpp"
+
 #include <array>
 #include <utility>
 #include <cstddef>
 #include <istream>
-
-#include "constants.hpp"
-#include "types.hpp"
-#include "core.hpp"
 
 namespace nevresim {
 struct SpikeSource
@@ -114,6 +115,10 @@ class Chip
     }
 
 public:
+    static constexpr std::size_t core_count_{CoreCount};
+    static constexpr std::size_t neuron_count_{NeuronCount};
+    static constexpr std::size_t axon_count_{AxonCount};
+
     static constexpr std::size_t input_size_{InputSize};
     static constexpr std::size_t output_size_{OutputSize};
 
@@ -164,14 +169,13 @@ public:
         }
     }
 
-    friend std::istream& operator>>(std::istream& weights_stream, Chip& chip)
+    void load_weights(
+        const ChipWeights<CoreCount, NeuronCount, AxonCount>& weights)
     {
-        for(auto& core : chip.cores_)
+        for(auto core_iter = std::begin(weights.cores_); auto& core : cores_)
         {
-            weights_stream >> core;
+            core.load_weights(*core_iter++);
         }
-
-        return weights_stream;
     }
 };
 

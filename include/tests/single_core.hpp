@@ -4,6 +4,7 @@
 #include "core.hpp"
 #include "chip.hpp"
 #include "input_loader.hpp"
+#include "weights_loader.hpp"
 
 #include "test_util.hpp"
 
@@ -58,11 +59,13 @@ bool test_single_core()
     constexpr auto compute = chip.generate_compute();
     constexpr auto read_output_buffer = chip.generate_read_output_buffer();
 
+    WeightsLoader<core_count, neuron_count, axon_count> weights_loader{};
     std::stringstream weights_stream("0 3 -2 3 7 -5");
     if(weights_stream)
     {
-        weights_stream >> chip;
+        weights_stream >> weights_loader;
     }
+    chip.load_weights(weights_loader.chip_weights_);
 
     std::array<raw_input_t, 2> input{1.0, 1.0};
         

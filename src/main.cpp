@@ -8,6 +8,7 @@
 #include "core.hpp"
 #include "chip.hpp"
 #include "input_loader.hpp"
+#include "weights_loader.hpp"
 #include "spike_generator.hpp"
 #include "chip_executor.hpp"
 
@@ -21,17 +22,22 @@ void test_generated_chip()
     auto compute = chip.generate_compute();
     auto read_output_buffer = chip.generate_read_output_buffer();
 
+    nevresim::WeightsLoader<
+        chip.core_count_, chip.neuron_count_, chip.axon_count_> 
+        weights_loader{};
     std::ifstream weights_stream("include/generated/chip_weights.txt");
     if(weights_stream.is_open())
     {
-        weights_stream >> chip;
+        weights_stream >> weights_loader;
     }
+
+    chip.load_weights(weights_loader.chip_weights_);
 
     int correct{};
     int total{};
     for(int idx = 0; idx < 50; ++idx)
     {
-        nevresim::InputLoader loader{};
+        nevresim::InputLoader input_loader{};
         std::string fname = 
             std::string{"inputs/inputs"} +
             std::to_string(idx) +
@@ -40,12 +46,12 @@ void test_generated_chip()
         std::ifstream input_stream(fname);
         if(input_stream.is_open())
         {
-            input_stream >> loader;
+            input_stream >> input_loader;
         }
         
         auto buffer = 
             nevresim::ChipExecutor<nevresim::SpikingExecution<200>>::execute(
-                loader.input_, chip, compute, read_output_buffer
+                input_loader.input_, chip, compute, read_output_buffer
             );
 
         chip.reset();
@@ -53,7 +59,7 @@ void test_generated_chip()
         nevresim::tests::print_prediction_summary(buffer);
         int guess = nevresim::tests::argmax(buffer);
         nevresim::tests::report_and_advance(
-            guess, loader.target_, idx, correct, total);
+            guess, input_loader.target_, idx, correct, total);
     }
 }
 
