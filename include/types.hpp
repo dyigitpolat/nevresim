@@ -25,19 +25,19 @@ struct ChipTypes
 };
 
 template <typename WeightType>
-using chip_weight_t = 
+using Weight = 
     typename ChipTypes<WeightType>::weight_t;
 
 template <typename WeightType>
-using chip_threshold_t = 
+using Threshold = 
     typename ChipTypes<WeightType>::threshold_t;
 
 template <typename WeightType>
-using chip_membrane_potential_t = 
+using MembranePotential = 
     typename ChipTypes<WeightType>::membrane_potential_t;
 
 template <typename WeightType>
-using chip_membrane_leak_t = 
+using MembraneLeak = 
     typename ChipTypes<WeightType>::membrane_leak_t;
 
 } // namespace nevresim
