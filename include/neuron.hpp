@@ -11,20 +11,21 @@
 namespace nevresim {
 template <
     std::size_t AxonCount,
-    membrane_leak_t LeakAmount = 0>
+    MembraneLeak<weight_t> LeakAmount = 0>
 class Neuron
 {
-    using weights_array_t = std::array< weight_t, AxonCount>;
+    using weights_array_t = std::array< Weight<weight_t>, AxonCount>;
 
     weights_array_t weights_{};
-    threshold_t threshold_{};
-    membrane_potential_t membrane_potential_{};
+    Threshold<weight_t> threshold_{};
+    MembranePotential<weight_t> membrane_potential_{};
 
     constexpr void leaky_integrate(const auto& incoming_spikes)
     {
         membrane_potential_ += std::inner_product(
             std::begin(weights_), std::end(weights_),
-            std::begin(incoming_spikes), static_cast<membrane_potential_t>(0)
+            std::begin(incoming_spikes), 
+            static_cast<MembranePotential<weight_t>>(0)
         ) - LeakAmount;
     }
 

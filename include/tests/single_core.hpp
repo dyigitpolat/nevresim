@@ -43,7 +43,7 @@ constexpr bool test_single_core()
     constexpr std::size_t core_count{1};
     constexpr std::size_t input_size{2};
     constexpr std::size_t output_size{2};
-    constexpr membrane_leak_t leak{0};
+    constexpr MembraneLeak<weight_t> leak{0};
 
     using Src = SpikeSource;
     using Con = CoreConnection<axon_count>;
@@ -63,7 +63,7 @@ constexpr bool test_single_core()
     using ChipW = ChipWeights<core_count, neuron_count, axon_count>;
     using CoreW = CoreWeights<neuron_count, axon_count>;
     using NeurW = NeuronWeights<axon_count>;
-    using Ws = std::array<weight_t, axon_count>;
+    using Ws = std::array<Weight<weight_t>, axon_count>;
     
     ChipW weights{{
         CoreW{{
@@ -80,7 +80,7 @@ constexpr bool test_single_core()
         );
 
     chip.reset();
-    return buffer == std::array<weight_t, 2>{4, 2};
+    return buffer == std::array<Weight<weight_t>, 2>{4, 2};
 }
 
 } // namespace nevresim::tests

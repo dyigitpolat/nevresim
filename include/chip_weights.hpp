@@ -12,8 +12,8 @@ template <
 class NeuronWeights
 {
 public:
-    threshold_t threshold_;
-    std::array<weight_t, AxonCount> weights_;
+    Threshold<weight_t> threshold_;
+    std::array<Weight<weight_t>, AxonCount> weights_;
 };
 
 template <

@@ -24,7 +24,7 @@ template <
     std::size_t core_count,
     std::size_t input_size,
     std::size_t output_size,
-    nevresim::membrane_leak_t leak = 0
+    nevresim::MembraneLeak<weight_t> leak = 0
 >
 consteval auto generate_test_chip()
 {

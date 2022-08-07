@@ -19,7 +19,7 @@ public:
         const auto& compute_function,
         const auto& output_buffer_read_function)
     {
-        std::array<weight_t, chip.output_size_> buffer{};
+        std::array<Weight<weight_t>, chip.output_size_> buffer{};
         for(int i = 0; i < SimulationLength; ++i){
             chip.feed_input_buffer(
                 SpikeProvider<chip.input_size_>::generate_spikes(input));
