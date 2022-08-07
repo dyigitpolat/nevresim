@@ -6,7 +6,7 @@ namespace nevresim {
 
 using raw_input_t = double;
 
-using weight_t = int;
+using weight_t = double;
 using threshold_t = weight_t;
 using membrane_potential_t = threshold_t;
 using membrane_leak_t = membrane_potential_t;
