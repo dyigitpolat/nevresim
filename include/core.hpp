@@ -15,7 +15,7 @@ namespace nevresim {
 template <
     std::size_t AxonCount,
     std::size_t NeuronCount,
-    MembraneLeak<weight_t> LeakAmount = 0>
+    MembraneLeak<weight_t> LeakAmount>
 class Core
 {
     using neuron_t = Neuron<AxonCount, LeakAmount>;

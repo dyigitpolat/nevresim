@@ -11,7 +11,7 @@
 namespace nevresim {
 template <
     std::size_t AxonCount,
-    MembraneLeak<weight_t> LeakAmount = 0>
+    MembraneLeak<weight_t> LeakAmount>
 class Neuron
 {
     using weights_array_t = std::array< Weight<weight_t>, AxonCount>;

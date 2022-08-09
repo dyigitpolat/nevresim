@@ -51,7 +51,7 @@ template<
         AxonCount,
         CoreCount,
         OutputSize> Configuration,
-    MembraneLeak<weight_t> LeakAmount = 0
+    MembraneLeak<weight_t> LeakAmount
     >
 class Chip
 {
