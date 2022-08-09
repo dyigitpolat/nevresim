@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
+#include <limits>
 
 namespace nevresim
 {
@@ -77,5 +78,19 @@ void report_and_advance(
     std::cout << "\n";
 }
 
+template <typename FloatType>
+constexpr bool is_almost_equal(
+    FloatType value_1, FloatType value_2)
+{
+    FloatType absolute_difference{
+        (value_1 > value_2) ?
+        (value_1 - value_2) :
+        (value_2 - value_1)
+    };
+
+    return absolute_difference < 
+        (std::numeric_limits<FloatType>::epsilon() * 2);
 }
-}
+
+} // namespace nevresim::tests
+} // namespace nevresim

@@ -4,6 +4,7 @@
 #include "spike_generator.hpp"
 
 #include <algorithm>
+#include <cstddef>
 
 namespace nevresim {
 
@@ -38,6 +39,23 @@ public:
     }
 };
 
+class RealExecution
+{
+public:
+    constexpr static auto execute(
+        const auto& input, 
+        auto& chip,
+        const auto& compute_function,
+        const auto& output_buffer_read_function)
+    {
+        for(std::size_t i = 0; i < chip.core_count_; ++i){
+            chip.feed_real_input_buffer(input);
+            compute_function(chip);
+        }
+
+        return output_buffer_read_function(chip);
+    }
+};
 
 template <typename ExecutePolicy>
 class ChipExecutor

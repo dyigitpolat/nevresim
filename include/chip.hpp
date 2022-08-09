@@ -62,8 +62,12 @@ class Chip
     using input_buffer_t = 
         std::array< spike_t, InputSize>;
 
+    using real_input_buffer_t = 
+        std::array< raw_input_t, InputSize>;
+
     cores_array_t cores_{};
     input_buffer_t input_buffer_{};
+    real_input_buffer_t real_input_buffer_{};
 
     consteval
     static auto retrieve_spike_from() 
@@ -86,6 +90,29 @@ class Chip
         };
     }
 
+    consteval
+    static auto retrieve_signal_from() 
+    {
+        return [](const Chip& chip, SpikeSource source) 
+            -> MembranePotential<weight_t> 
+            {
+                if(source.core_ == k_input_buffer_id)
+                {
+                    return chip.real_input_buffer_[source.neuron_];
+                }
+                else if(source.core_ == k_no_connection)
+                {
+                    return MembranePotential<weight_t>{};
+                }
+                else
+                {
+                    return 
+                        chip.cores_[source.core_]
+                            .get_output_signals()[source.neuron_];
+                }
+            };
+    }
+
     template <std::size_t N> consteval
     static auto retrieve_spikes() 
     {
@@ -105,11 +132,39 @@ class Chip
         };
     }
 
+    template <std::size_t N> consteval
+    static auto retrieve_signals() 
+    {
+        return [](const Chip& chip, auto signal_sources) {
+            std::array<MembranePotential<weight_t>, N> spikes{};
+
+            [&]<std::size_t ...Idx> (std::index_sequence<Idx...>)
+            {
+                (
+                    (spikes[Idx] 
+                        = retrieve_signal_from()(chip, signal_sources[Idx])
+                    )
+                , ...);
+            }(std::make_index_sequence<N>{});
+
+            return spikes;
+        };
+    }
+
     consteval
     static auto get_input_for() 
     {
         return [](const Chip& chip, core_id_t core_id){
             return retrieve_spikes<AxonCount>()(
+                chip, Configuration.core_sources_[core_id].sources_);
+        };
+    }
+
+    consteval
+    static auto get_real_input_for() 
+    {
+        return [](const Chip& chip, core_id_t core_id){
+            return retrieve_signals<AxonCount>()(
                 chip, Configuration.core_sources_[core_id].sources_);
         };
     }
@@ -139,6 +194,16 @@ public:
         };
     }
 
+    constexpr 
+    static auto generate_read_real_output_buffer()
+    {
+        return [](const Chip& chip){
+            return 
+                retrieve_signals<OutputSize>()(
+                    chip, Configuration.output_sources_);
+        };
+    }
+
     consteval 
     static auto generate_compute() 
     {
@@ -156,10 +221,34 @@ public:
         };
     }
 
+    consteval 
+    static auto generate_compute_real() 
+    {
+        return [](Chip& chip){
+            [] <core_id_t ...IDs>
+            (Chip& chip_, std::index_sequence<IDs...>)
+            {
+                std::array<std::array<
+                    MembranePotential<weight_t>, AxonCount>, CoreCount> 
+                    axons{};
+
+                ((axons[IDs] = get_real_input_for()(chip_, IDs)), ...);
+                (chip_.cores_[IDs].compute_real(axons[IDs]), ...);
+                
+            } (chip, std::make_index_sequence<CoreCount>{});
+        };
+    }
+
     constexpr
     void feed_input_buffer(const input_buffer_t& feed)
     {
         input_buffer_ = feed;
+    }
+
+    constexpr
+    void feed_real_input_buffer(const auto& feed)
+    {
+        std::ranges::copy(feed, std::begin(real_input_buffer_)); 
     }
 
     constexpr

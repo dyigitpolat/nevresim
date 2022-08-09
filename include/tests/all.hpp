@@ -2,6 +2,7 @@
 
 #include "tests/single_core.hpp"
 #include "tests/multi_core.hpp"
+#include "tests/real_valued_single_core.hpp"
 
 #include <iostream>
 
@@ -12,6 +13,7 @@ namespace tests
 
 static_assert(test_single_core());
 static_assert(test_3_core_2x2());
+static_assert(test_single_real_valued_core());
 
 void report_result(auto title, auto test)
 {
@@ -26,6 +28,7 @@ void run_all()
 {
     report_result("single core", test_single_core);
     report_result("3 core 2x2", test_3_core_2x2);
+    report_result("real valued single core", test_single_real_valued_core);
 }
 
 }

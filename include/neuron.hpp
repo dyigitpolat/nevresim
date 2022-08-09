@@ -56,6 +56,17 @@ public:
     }
 
     constexpr
+    MembranePotential<weight_t> compute_real(const auto& incoming_signal)
+    {
+        return std::max(0.0, 
+            std::inner_product(
+                std::begin(weights_), std::end(weights_),
+                std::begin(incoming_signal), 
+                static_cast<MembranePotential<weight_t>>(0)
+            ));
+    }
+
+    constexpr
     void reset()
     {
         membrane_potential_ = 0;

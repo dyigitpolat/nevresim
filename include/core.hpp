@@ -21,9 +21,12 @@ class Core
     using neuron_t = Neuron<AxonCount, LeakAmount>;
     using neurons_array_t = std::array<neuron_t, NeuronCount>;
     using output_array_t = std::array<spike_t, NeuronCount>;
+    using real_output_array_t = 
+        std::array<MembranePotential<weight_t>, NeuronCount>;
 
     neurons_array_t neurons_{};
     output_array_t output_spikes_{};
+    real_output_array_t output_signals_{};
 
 public:
     constexpr 
@@ -39,11 +42,26 @@ public:
     }
 
     constexpr
+    const real_output_array_t& get_output_signals() const & 
+    {
+        return output_signals_;
+    }
+
+    constexpr
     void compute(const auto& incoming_spikes)
     {
         std::ranges::transform(
             neurons_, std::ranges::begin(output_spikes_),
             [&](auto& neuron) { return neuron.compute(incoming_spikes); }
+        );
+    }
+
+    constexpr 
+    void compute_real(const auto& incoming_signals)
+    {
+        std::ranges::transform(
+            neurons_, std::ranges::begin(output_signals_),
+            [&](auto& neuron) { return neuron.compute_real(incoming_signals); }
         );
     }
 
