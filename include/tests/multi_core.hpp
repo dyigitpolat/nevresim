@@ -75,13 +75,13 @@ constexpr bool test_3_core_2x2()
     
     ChipW weights{{
         CoreW{{
-            NeurW{2.0, Ws{2.0,0.0}}, NeurW{3.0, Ws{0.0,3.0}}
+            NeurW{Ws{2.0,0.0}, 2.0}, NeurW{Ws{0.0,3.0}, 3.0}
         }},
         CoreW{{
-            NeurW{1.0, Ws{2.0,0.0}}, NeurW{3.0, Ws{0.0,3.0}}
+            NeurW{Ws{2.0,0.0}, 1.0}, NeurW{Ws{0.0,3.0}, 3.0}
         }},
         CoreW{{
-            NeurW{2.0, Ws{2.0,0.0}}, NeurW{2.0, Ws{0.0,3.0}}
+            NeurW{Ws{2.0,0.0}, 2.0}, NeurW{Ws{0.0,3.0}, 2.0}
         }}
     }};
     chip.load_weights(weights);

@@ -18,15 +18,18 @@ class Neuron
 
     weights_array_t weights_{};
     Threshold<weight_t> threshold_{};
+    Bias<weight_t> bias_{};
     MembranePotential<weight_t> membrane_potential_{};
 
     constexpr void leaky_integrate(const auto& incoming_spikes)
     {
-        membrane_potential_ += std::inner_product(
-            std::begin(weights_), std::end(weights_),
-            std::begin(incoming_spikes), 
-            static_cast<MembranePotential<weight_t>>(0)
-        ) - LeakAmount;
+        membrane_potential_ += 
+            std::inner_product(
+                std::begin(weights_), std::end(weights_),
+                std::begin(incoming_spikes), 
+                static_cast<MembranePotential<weight_t>>(0))
+            + bias_ 
+            - LeakAmount;
     }
 
     constexpr spike_t fire()
@@ -77,6 +80,7 @@ public:
     {
         threshold_ = weights.threshold_;
         weights_ = weights.weights_;
+        bias_ = weights.bias_;
     }
 };
 

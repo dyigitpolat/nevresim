@@ -67,7 +67,7 @@ constexpr bool test_single_core()
     
     ChipW weights{{
         CoreW{{
-            NeurW{0.0, Ws{3.0,-2.0}}, NeurW{3.0, Ws{7.0,-5.0}}
+            NeurW{Ws{2.0,-2.0}, {}, 1.0}, NeurW{Ws{9.0,-5.0}, 3.0, -2.0}
         }}
     }};
     chip.load_weights(weights);

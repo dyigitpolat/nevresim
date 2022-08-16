@@ -17,6 +17,7 @@ struct ChipTypes
     using weight_t = WeightType;
     using threshold_t = weight_t;
     using membrane_potential_t = threshold_t;
+    using bias_t = threshold_t;
     using membrane_leak_t = membrane_potential_t;
 };
 
@@ -31,6 +32,10 @@ using Threshold =
 template <typename WeightType>
 using MembranePotential = 
     typename ChipTypes<WeightType>::membrane_potential_t;
+
+template <typename WeightType>
+using Bias = 
+    typename ChipTypes<WeightType>::bias_t;
 
 template <typename WeightType>
 using MembraneLeak = 

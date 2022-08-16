@@ -69,12 +69,12 @@ constexpr bool test_multi_real_valued_core()
     
     ChipW weights{{
         CoreW{{
-            NeurW{0.0, Ws{0.1,0.2}}, 
-            NeurW{0.0, Ws{0.5,-0.1}} 
+            NeurW{Ws{0.1,0.2}}, 
+            NeurW{Ws{0.5,-0.1}} 
         }},
         CoreW{{
-            NeurW{0.0, Ws{0.5,-0.5}}, 
-            NeurW{0.0, Ws{-1.0,1.0}} 
+            NeurW{Ws{0.5,-0.5}}, 
+            NeurW{Ws{-1.0,1.0}} 
         }}
     }};
     chip.load_weights(weights);

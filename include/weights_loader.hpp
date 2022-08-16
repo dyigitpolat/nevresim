@@ -28,6 +28,7 @@ public:
             for(auto& neuron : core.neurons_)
             {
                 weights_stream >> neuron.threshold_;
+                weights_stream >> neuron.bias_;
                 for(auto& weight : neuron.weights_)
                 {
                     weights_stream >> weight;
