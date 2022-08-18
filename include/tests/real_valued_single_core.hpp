@@ -69,7 +69,7 @@ constexpr bool test_single_real_valued_core()
     
     ChipW weights{{
         CoreW{{
-            NeurW{Ws{3.0,-2.0, 0.1}}, 
+            NeurW{Ws{3.0,-2.0, 0.1}, {}, 4.2}, 
             NeurW{Ws{7.0,-5.0, 0.0}},
             NeurW{Ws{0.0, 1.0, 0.0}},
         }}
@@ -87,7 +87,7 @@ constexpr bool test_single_real_valued_core()
     return 
         std::inner_product(
             std::begin(buffer), std::end(buffer),
-            std::begin(std::array<Weight<weight_t>, 3>{2.03, 4.5, 0.5}), 
+            std::begin(std::array<Weight<weight_t>, 3>{6.23, 4.5, 0.5}), 
             true, std::logical_and<bool>{}, is_almost_equal<double>);
 }
 
