@@ -31,16 +31,6 @@ struct ChipConfiguration {
     std::array<SpikeSource, OutputSize> output_sources_{};
 };
 
-template <size_t N> consteval
-auto make_spike_array(auto iter) 
-{
-    return 
-        [&]<std::size_t ...Idx> (std::index_sequence<Idx...>)
-        {
-            return std::array<spike_t, N> { ((void)Idx, *(iter++))... };
-        }(std::make_index_sequence<N>{});
-} 
-
 template<
     std::size_t AxonCount,
     std::size_t NeuronCount,
