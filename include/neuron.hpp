@@ -61,12 +61,13 @@ public:
     constexpr
     MembranePotential<weight_t> compute_real(const auto& incoming_signal)
     {
-        return std::max(0.0, 
+        return std::max(
+            static_cast<MembranePotential<weight_t>>(0), 
             std::inner_product(
                 std::begin(weights_), std::end(weights_),
                 std::begin(incoming_signal), 
                 static_cast<MembranePotential<weight_t>>(0)
-            ));
+            ) + bias_);
     }
 
     constexpr
