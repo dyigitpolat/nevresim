@@ -9,9 +9,11 @@ template <typename Chip>
 class SpikingCompute
 {
     consteval
-    static auto retrieve_spike_from() 
+    static auto retrieve_signal_from() 
     {
-        return [](const Chip& chip, SpikeSource source) -> spike_t {
+        return [](const Chip& chip, SpikeSource source) 
+        -> spike_t 
+        {
             if(source.core_ == k_input_buffer_id)
             {
                 return chip.get_input_buffer()[source.neuron_];
@@ -30,16 +32,16 @@ class SpikingCompute
     }
 
     template <std::size_t N> consteval
-    static auto retrieve_spikes() 
+    static auto retrieve_signals() 
     {
-        return [](const Chip& chip, auto spike_sources) {
+        return [](const Chip& chip, auto signal_sources) {
             std::array<spike_t, N> spikes{};
 
             [&]<std::size_t ...Idx> (std::index_sequence<Idx...>)
             {
                 (
                     (spikes[Idx] 
-                        = retrieve_spike_from()(chip, spike_sources[Idx])
+                        = retrieve_signal_from()(chip, signal_sources[Idx])
                     )
                 , ...);
             }(std::make_index_sequence<N>{});
@@ -52,7 +54,7 @@ class SpikingCompute
     static auto get_input_for() 
     {
         return [](const Chip& chip, core_id_t core_id){
-            return retrieve_spikes<Chip::axon_count_>()(
+            return retrieve_signals<Chip::axon_count_>()(
                 chip, Chip::config_.core_sources_[core_id].sources_);
         };
     }
@@ -63,7 +65,7 @@ public:
     {
         return [](const Chip& chip){
             return 
-                retrieve_spikes<Chip::output_size_>()(
+                retrieve_signals<Chip::output_size_>()(
                     chip, Chip::config_.output_sources_);
         };
     }

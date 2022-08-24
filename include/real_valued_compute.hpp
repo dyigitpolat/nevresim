@@ -51,7 +51,7 @@ class RealValuedCompute
     }
 
     consteval
-    static auto get_real_input_for() 
+    static auto get_input_for() 
     {
         return [](const Chip& chip, core_id_t core_id){
             return retrieve_signals<Chip::axon_count_>()(
@@ -81,7 +81,7 @@ public:
                     MembranePotential<weight_t>, Chip::axon_count_>, 
                     Chip::core_count_> axons{};
 
-                ((axons[IDs] = get_real_input_for()(chip_, IDs)), ...);
+                ((axons[IDs] = get_input_for()(chip_, IDs)), ...);
                 (chip_.get_cores()[IDs].compute_real(axons[IDs]), ...);
                 
             } (chip, std::make_index_sequence<Chip::core_count_>{});
