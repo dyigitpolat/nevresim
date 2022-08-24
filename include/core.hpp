@@ -15,18 +15,18 @@ namespace nevresim {
 template <
     std::size_t AxonCount,
     std::size_t NeuronCount,
-    MembraneLeak<weight_t> LeakAmount>
+    MembraneLeak<weight_t> LeakAmount,
+    typename ComputePolicyBase
+    >
 class Core
 {
+    using signal_t = ComputePolicyBase::signal_t;
     using neuron_t = Neuron<AxonCount, LeakAmount>;
     using neurons_array_t = std::array<neuron_t, NeuronCount>;
-    using output_array_t = std::array<spike_t, NeuronCount>;
-    using real_output_array_t = 
-        std::array<MembranePotential<weight_t>, NeuronCount>;
+    using output_array_t = std::array<signal_t, NeuronCount>;
 
     neurons_array_t neurons_{};
-    output_array_t output_spikes_{};
-    real_output_array_t output_signals_{};
+    output_array_t output_{};
 
 public:
     constexpr 
@@ -36,32 +36,19 @@ public:
     Core(neurons_array_t neurons) : neurons_(neurons) {}
 
     constexpr
-    const output_array_t& get_output_spikes() const & 
+    const output_array_t& get_output() const & 
     {
-        return output_spikes_;
+        return output_;
     }
 
-    constexpr
-    const real_output_array_t& get_output_signals() const & 
-    {
-        return output_signals_;
-    }
-
-    constexpr
-    void compute(const auto& incoming_spikes)
+    constexpr void compute(const auto& incoming_signals)
     {
         std::ranges::transform(
-            neurons_, std::ranges::begin(output_spikes_),
-            [&](auto& neuron) { return neuron.compute(incoming_spikes); }
-        );
-    }
-
-    constexpr 
-    void compute_real(const auto& incoming_signals)
-    {
-        std::ranges::transform(
-            neurons_, std::ranges::begin(output_signals_),
-            [&](auto& neuron) { return neuron.compute_real(incoming_signals); }
+            neurons_, std::ranges::begin(output_),
+            [&](auto& neuron) { 
+                return neuron.template compute<ComputePolicyBase>
+                    (incoming_signals); 
+            }
         );
     }
 

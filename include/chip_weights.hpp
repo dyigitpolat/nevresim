@@ -1,9 +1,9 @@
 #pragma once
 
-#include <array>
-
 #include "constants.hpp"
 #include "types.hpp"
+
+#include <array>
 
 namespace nevresim {
 

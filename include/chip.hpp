@@ -29,20 +29,17 @@ template<
     >
 class Chip
 {
+    using core_t = Core<
+        AxonCount, 
+        NeuronCount, LeakAmount, 
+        typename ComputePolicy<Chip>::base_t>;
     using cores_array_t = 
-        std::array< 
-            Core< AxonCount, NeuronCount, LeakAmount>, CoreCount>;
-
-    using real_input_buffer_t = 
-        std::array< raw_input_t, InputSize>;
-
-    
+        std::array<core_t, CoreCount>;
     using input_buffer_t = 
-        std::array<spike_t, InputSize>;
+        std::array<typename ComputePolicy<Chip>::signal_t, InputSize>;
 
     cores_array_t cores_{};
     input_buffer_t input_buffer_{};
-    real_input_buffer_t real_input_buffer_{};
 
 public:
     static constexpr std::size_t core_count_{CoreCount};
@@ -61,7 +58,7 @@ public:
     constexpr 
     Chip() : cores_{} {}
 
-    constexpr 
+    consteval
     static auto generate_read_output_buffer()
     {
         return ComputePolicy<Chip>::generate_read_output_buffer();
@@ -74,15 +71,9 @@ public:
     }
 
     constexpr
-    void feed_input_buffer(const input_buffer_t& feed)
+    void feed_input_buffer(const auto& feed)
     {
-        input_buffer_ = feed;
-    }
-
-    constexpr
-    void feed_real_input_buffer(const auto& feed)
-    {
-        std::ranges::copy(feed, std::begin(real_input_buffer_)); 
+        std::ranges::copy(feed, std::begin(input_buffer_)); 
     }
 
     constexpr
@@ -116,13 +107,6 @@ public:
 
     constexpr
     input_buffer_t& get_input_buffer() { return input_buffer_; } 
-
-    constexpr
-    const real_input_buffer_t& get_real_input_buffer() const { return real_input_buffer_; } 
-
-    constexpr
-    real_input_buffer_t& get_real_input_buffer() { return real_input_buffer_; } 
-
 };
 
 } // namespace nevresim

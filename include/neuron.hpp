@@ -2,13 +2,16 @@
 
 #include "chip_weights.hpp"
 #include "types.hpp"
+#include "neuron_compute.hpp"
 
 #include <array>
 #include <numeric>
 #include <cstddef>
 #include <istream>
+#include <type_traits>
 
 namespace nevresim {
+
 template <
     std::size_t AxonCount,
     MembraneLeak<weight_t> LeakAmount>
@@ -51,23 +54,10 @@ public:
     constexpr 
     Neuron(weights_array_t weights) : weights_{weights} {}
 
-    constexpr
-    spike_t compute(const auto& incoming_spikes)
+    template <typename ComputePolicy> constexpr ComputePolicy::signal_t 
+    compute(const auto& incoming_signal)
     {
-        leaky_integrate(incoming_spikes);
-        return fire();
-    }
-
-    constexpr
-    MembranePotential<weight_t> compute_real(const auto& incoming_signal)
-    {
-        return std::max(
-            static_cast<MembranePotential<weight_t>>(0), 
-            std::inner_product(
-                std::begin(weights_), std::end(weights_),
-                std::begin(incoming_signal), 
-                static_cast<MembranePotential<weight_t>>(0)
-            ) + bias_);
+        return NeuronCompute<ComputePolicy>::compute(*this, incoming_signal);
     }
 
     constexpr
@@ -83,6 +73,9 @@ public:
         weights_ = weights.weights_;
         bias_ = weights.bias_;
     }
+
+    template <typename T>
+    friend class NeuronCompute;
 };
 
 } // namespace nevresim

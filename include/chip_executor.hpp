@@ -49,7 +49,7 @@ public:
         const auto& output_buffer_read_function)
     {
         for(std::size_t i = 0; i < chip.core_count_; ++i){
-            chip.feed_real_input_buffer(input);
+            chip.feed_input_buffer(input);
             compute_function(chip);
         }
 
