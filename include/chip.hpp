@@ -25,7 +25,7 @@ template<
         CoreCount,
         OutputSize> Configuration,
     MembraneLeak<weight_t> LeakAmount,
-    template <typename> typename ComputePolicy = SpikingCompute
+    template <typename> typename ComputePolicy
     >
 class Chip
 {
