@@ -11,15 +11,17 @@
 #include "weights_loader.hpp"
 #include "spike_generator.hpp"
 #include "chip_executor.hpp"
+#include "spiking_compute.hpp"
+#include "real_valued_compute.hpp"
 
 #include "tests/all.hpp"
-
 
 /*
 #include "generated/generate_chip.hpp"
 void test_generated_chip()
 {
-    static constinit auto chip = nevresim::generate_chip();
+    static constinit auto chip = 
+        nevresim::generate_chip<nevresim::SpikingCompute>();
     constexpr auto compute = chip.generate_compute();
     constexpr auto read_output_buffer = chip.generate_read_output_buffer();
 
@@ -52,7 +54,7 @@ void test_generated_chip()
         
         auto buffer = 
             nevresim::ChipExecutor<nevresim::SpikingExecution<
-                1000, nevresim::SpikeGenerator
+                100, nevresim::SpikeGenerator
                 >>::execute(
                 input_loader.input_, chip, compute, read_output_buffer
             );
@@ -68,12 +70,12 @@ void test_generated_chip()
 */
 
 /*
-#include "generated/generate_chip.hpp"
 void test_generated_chip_real()
 {
-    static constinit auto chip = nevresim::generate_chip();
-    constexpr auto compute = chip.generate_compute_real();
-    constexpr auto read_output_buffer = chip.generate_read_real_output_buffer();
+    static constinit auto chip = 
+        nevresim::generate_chip<nevresim::RealValuedCompute>();
+    constexpr auto compute = chip.generate_compute();
+    constexpr auto read_output_buffer = chip.generate_read_output_buffer();
 
     nevresim::WeightsLoader<
         chip.core_count_, chip.neuron_count_, chip.axon_count_> 
@@ -117,12 +119,14 @@ void test_generated_chip_real()
 }
 */
 
+
 #include "generated/simple_generate_chip.hpp"
 void test_simple_generated_chip_real()
 {
-    static constinit auto chip = nevresim::generate_chip();
-    constexpr auto compute = chip.generate_compute_real();
-    constexpr auto read_output_buffer = chip.generate_read_real_output_buffer();
+    static constinit auto chip = 
+        nevresim::generate_chip<nevresim::RealValuedCompute>();
+    constexpr auto compute = chip.generate_compute();
+    constexpr auto read_output_buffer = chip.generate_read_output_buffer();
 
     nevresim::WeightsLoader<
         chip.core_count_, chip.neuron_count_, chip.axon_count_> 

@@ -4,6 +4,8 @@
 #include "constants.hpp"
 #include "types.hpp"
 #include "core.hpp"
+#include "chip_utilities.hpp"
+#include "spiking_compute.hpp"
 
 #include <array>
 #include <utility>
@@ -11,25 +13,6 @@
 #include <istream>
 
 namespace nevresim {
-struct SpikeSource
-{
-    core_id_t core_{};
-    axon_id_t neuron_{};
-};
-
-template<std::size_t AxonCount>
-struct CoreConnection {
-    std::array<SpikeSource, AxonCount> sources_{};
-};
-
-template<
-    std::size_t AxonCount,
-    std::size_t CoreCount,
-    std::size_t OutputSize>
-struct ChipConfiguration {
-    std::array<CoreConnection<AxonCount>, CoreCount> core_sources_{};
-    std::array<SpikeSource, OutputSize> output_sources_{};
-};
 
 template<
     std::size_t AxonCount,
@@ -41,123 +24,25 @@ template<
         AxonCount,
         CoreCount,
         OutputSize> Configuration,
-    MembraneLeak<weight_t> LeakAmount
+    MembraneLeak<weight_t> LeakAmount,
+    template <typename> typename ComputePolicy = SpikingCompute
     >
 class Chip
 {
     using cores_array_t = 
         std::array< 
             Core< AxonCount, NeuronCount, LeakAmount>, CoreCount>;
-    
-    using input_buffer_t = 
-        std::array< spike_t, InputSize>;
 
     using real_input_buffer_t = 
         std::array< raw_input_t, InputSize>;
 
+    
+    using input_buffer_t = 
+        std::array<spike_t, InputSize>;
+
     cores_array_t cores_{};
     input_buffer_t input_buffer_{};
     real_input_buffer_t real_input_buffer_{};
-
-    consteval
-    static auto retrieve_spike_from() 
-    {
-        return [](const Chip& chip, SpikeSource source) -> spike_t {
-            if(source.core_ == k_input_buffer_id)
-            {
-                return chip.input_buffer_[source.neuron_];
-            }
-            else if(source.core_ == k_no_connection)
-            {
-                return spike_t{};
-            }
-            else
-            {
-                return 
-                    chip.cores_[source.core_]
-                        .get_output_spikes()[source.neuron_];
-            }
-        };
-    }
-
-    consteval
-    static auto retrieve_signal_from() 
-    {
-        return [](const Chip& chip, SpikeSource source) 
-            -> MembranePotential<weight_t> 
-            {
-                if(source.core_ == k_input_buffer_id)
-                {
-                    return chip.real_input_buffer_[source.neuron_];
-                }
-                else if(source.core_ == k_no_connection)
-                {
-                    return MembranePotential<weight_t>{};
-                }
-                else
-                {
-                    return 
-                        chip.cores_[source.core_]
-                            .get_output_signals()[source.neuron_];
-                }
-            };
-    }
-
-    template <std::size_t N> consteval
-    static auto retrieve_spikes() 
-    {
-        return [](const Chip& chip, auto spike_sources) {
-            std::array<spike_t, N> spikes{};
-
-            [&]<std::size_t ...Idx> (std::index_sequence<Idx...>)
-            {
-                (
-                    (spikes[Idx] 
-                        = retrieve_spike_from()(chip, spike_sources[Idx])
-                    )
-                , ...);
-            }(std::make_index_sequence<N>{});
-
-            return spikes;
-        };
-    }
-
-    template <std::size_t N> consteval
-    static auto retrieve_signals() 
-    {
-        return [](const Chip& chip, auto signal_sources) {
-            std::array<MembranePotential<weight_t>, N> spikes{};
-
-            [&]<std::size_t ...Idx> (std::index_sequence<Idx...>)
-            {
-                (
-                    (spikes[Idx] 
-                        = retrieve_signal_from()(chip, signal_sources[Idx])
-                    )
-                , ...);
-            }(std::make_index_sequence<N>{});
-
-            return spikes;
-        };
-    }
-
-    consteval
-    static auto get_input_for() 
-    {
-        return [](const Chip& chip, core_id_t core_id){
-            return retrieve_spikes<AxonCount>()(
-                chip, Configuration.core_sources_[core_id].sources_);
-        };
-    }
-
-    consteval
-    static auto get_real_input_for() 
-    {
-        return [](const Chip& chip, core_id_t core_id){
-            return retrieve_signals<AxonCount>()(
-                chip, Configuration.core_sources_[core_id].sources_);
-        };
-    }
 
 public:
     static constexpr std::size_t core_count_{CoreCount};
@@ -167,66 +52,25 @@ public:
     static constexpr std::size_t input_size_{InputSize};
     static constexpr std::size_t output_size_{OutputSize};
 
+    static constexpr ChipConfiguration config_ = Configuration;
+
 public:
     constexpr 
     Chip(cores_array_t cores) : cores_(cores) {}
 
     constexpr 
     Chip() : cores_{} {}
-    
+
     constexpr 
     static auto generate_read_output_buffer()
     {
-        return [](const Chip& chip){
-            return 
-                retrieve_spikes<OutputSize>()(
-                    chip, Configuration.output_sources_);
-        };
-    }
-
-    constexpr 
-    static auto generate_read_real_output_buffer()
-    {
-        return [](const Chip& chip){
-            return 
-                retrieve_signals<OutputSize>()(
-                    chip, Configuration.output_sources_);
-        };
+        return ComputePolicy<Chip>::generate_read_output_buffer();
     }
 
     consteval 
     static auto generate_compute() 
     {
-        return [](Chip& chip){
-            [] <core_id_t ...IDs>
-            (Chip& chip_, std::index_sequence<IDs...>)
-            {
-                std::array<std::array<spike_t, AxonCount>, CoreCount> 
-                    axons{};
-
-                ((axons[IDs] = get_input_for()(chip_, IDs)), ...);
-                (chip_.cores_[IDs].compute(axons[IDs]), ...);
-                
-            } (chip, std::make_index_sequence<CoreCount>{});
-        };
-    }
-
-    consteval 
-    static auto generate_compute_real() 
-    {
-        return [](Chip& chip){
-            [] <core_id_t ...IDs>
-            (Chip& chip_, std::index_sequence<IDs...>)
-            {
-                std::array<std::array<
-                    MembranePotential<weight_t>, AxonCount>, CoreCount> 
-                    axons{};
-
-                ((axons[IDs] = get_real_input_for()(chip_, IDs)), ...);
-                (chip_.cores_[IDs].compute_real(axons[IDs]), ...);
-                
-            } (chip, std::make_index_sequence<CoreCount>{});
-        };
+        return ComputePolicy<Chip>::generate_compute();
     }
 
     constexpr
@@ -259,6 +103,26 @@ public:
             core.load_weights(*core_iter++);
         }
     }
+
+    constexpr
+    const cores_array_t& get_cores() const { return cores_; } 
+
+    constexpr
+    cores_array_t& get_cores() { return cores_; } 
+
+
+    constexpr
+    const input_buffer_t& get_input_buffer() const { return input_buffer_; } 
+
+    constexpr
+    input_buffer_t& get_input_buffer() { return input_buffer_; } 
+
+    constexpr
+    const real_input_buffer_t& get_real_input_buffer() const { return real_input_buffer_; } 
+
+    constexpr
+    real_input_buffer_t& get_real_input_buffer() { return real_input_buffer_; } 
+
 };
 
 } // namespace nevresim

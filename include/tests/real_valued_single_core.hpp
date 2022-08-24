@@ -6,6 +6,7 @@
 #include "input_loader.hpp"
 #include "weights_loader.hpp"
 #include "deterministic_spike_generator.hpp"
+#include "real_valued_compute.hpp"
 
 #include "test_util.hpp"
 
@@ -58,9 +59,10 @@ constexpr bool test_single_real_valued_core()
         core_count,
         input_size,
         output_size,
-        leak> ();
-    constexpr auto compute = chip.generate_compute_real();
-    constexpr auto read_output_buffer = chip.generate_read_real_output_buffer();
+        leak,
+        RealValuedCompute> ();
+    constexpr auto compute = chip.generate_compute();
+    constexpr auto read_output_buffer = chip.generate_read_output_buffer();
 
     using ChipW = ChipWeights<core_count, neuron_count, axon_count>;
     using CoreW = CoreWeights<neuron_count, axon_count>;

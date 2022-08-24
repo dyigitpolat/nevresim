@@ -6,6 +6,7 @@
 #include "input_loader.hpp"
 #include "weights_loader.hpp"
 #include "deterministic_spike_generator.hpp"
+#include "spiking_compute.hpp"
 
 #include "test_util.hpp"
 
@@ -56,7 +57,8 @@ constexpr bool test_single_core()
         core_count,
         input_size,
         output_size,
-        leak> ();
+        leak,
+        SpikingCompute> ();
     constexpr auto compute = chip.generate_compute();
     constexpr auto read_output_buffer = chip.generate_read_output_buffer();
 
