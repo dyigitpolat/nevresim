@@ -61,7 +61,7 @@ private:
     }
 
 public: 
-    constexpr 
+    consteval
     static auto generate_read_output_buffer()
     {
         return [](const Chip& chip){
