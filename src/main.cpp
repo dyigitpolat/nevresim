@@ -121,10 +121,10 @@ void test_generated_chip_real()
 
 
 #include "generated/simple_generate_chip.hpp"
-void test_simple_generated_chip_real()
+void test_simple_generated_chip_spiking()
 {
     static constinit auto chip = 
-        nevresim::generate_chip<nevresim::RealValuedCompute>();
+        nevresim::generate_chip<nevresim::SpikingCompute>();
     constexpr auto compute = chip.generate_compute();
     constexpr auto read_output_buffer = chip.generate_read_output_buffer();
 
@@ -156,7 +156,9 @@ void test_simple_generated_chip_real()
         }
         
         auto buffer = 
-            nevresim::ChipExecutor<nevresim::RealExecution>::execute(
+            nevresim::ChipExecutor<
+                nevresim::SpikingExecution<
+                    5000, nevresim::SpikeGenerator>>::execute(
                 input_loader.input_, chip, compute, read_output_buffer
             );
 
@@ -183,8 +185,8 @@ int main()
     
     main_menu.add_menu_item({nevresim::tests::run_all, "run all tests"});
     //main_menu.add_menu_item({test_generated_chip, "test generated chip"});
-    main_menu.add_menu_item({test_simple_generated_chip_real, 
-        "real valued test of generated chip"});
+    main_menu.add_menu_item({test_simple_generated_chip_spiking, 
+        "spiking test of generated XOR chip"});
     main_menu.show();
 
     return 0;
