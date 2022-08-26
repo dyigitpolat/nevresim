@@ -124,9 +124,9 @@ void test_generated_chip_real()
 void test_simple_generated_chip_spiking()
 {
     static constinit auto chip = 
-        nevresim::generate_chip<nevresim::SpikingCompute>();
-    constexpr auto compute = chip.generate_compute();
-    constexpr auto read_output_buffer = chip.generate_read_output_buffer();
+        nevresim::generate_chip<
+            nevresim::SpikingExecution<
+                5000, nevresim::SpikeGenerator>>();
 
     nevresim::WeightsLoader<
         chip.core_count_, chip.neuron_count_, chip.axon_count_> 
@@ -155,12 +155,7 @@ void test_simple_generated_chip_spiking()
             input_stream >> input_loader;
         }
         
-        auto buffer = 
-            nevresim::ChipExecutor<
-                nevresim::SpikingExecution<
-                    5000, nevresim::SpikeGenerator>>::execute(
-                input_loader.input_, chip, compute, read_output_buffer
-            );
+        auto buffer = chip.execute(input_loader.input_);
 
         chip.reset();
 

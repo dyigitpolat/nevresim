@@ -60,9 +60,7 @@ constexpr bool test_multi_real_valued_core()
         input_size,
         output_size,
         leak,
-        RealValuedCompute> ();
-    constexpr auto compute = chip.generate_compute();
-    constexpr auto read_output_buffer = chip.generate_read_output_buffer();
+        RealExecution> ();
 
     using ChipW = ChipWeights<core_count, neuron_count, axon_count>;
     using CoreW = CoreWeights<neuron_count, axon_count>;
@@ -83,10 +81,7 @@ constexpr bool test_multi_real_valued_core()
 
     std::array<raw_input_t, 2> input{0.3, 0.2};
         
-    auto buffer = 
-        ChipExecutor<RealExecution>::execute(
-            input, chip, compute, read_output_buffer
-        );
+    auto buffer = chip.execute(input);
 
     chip.reset();
     return 

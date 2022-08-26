@@ -2,6 +2,8 @@
 
 #include "input_loader.hpp"
 #include "spike_generator.hpp"
+#include "real_valued_compute.hpp"
+#include "spiking_compute.hpp"
 
 #include <algorithm>
 #include <cstddef>
@@ -14,6 +16,9 @@ template <
 class SpikingExecution
 {
 public:
+    template <typename C>
+    using compute_policy_t = SpikingCompute<C>;
+
     constexpr static auto execute(
         const auto& input, 
         auto& chip,
@@ -42,6 +47,9 @@ public:
 class RealExecution
 {
 public:
+    template <typename C>
+    using compute_policy_t = RealValuedCompute<C>;
+
     constexpr static auto execute(
         const auto& input, 
         auto& chip,
