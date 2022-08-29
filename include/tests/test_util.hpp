@@ -30,10 +30,10 @@ template <
 >
 consteval auto generate_test_chip()
 {
-    using Cfg = nevresim::ChipConfiguration<
+    using Map = nevresim::Mapping<
         axon_count, core_count, output_size>;
 
-    constexpr Cfg config{connections, outputs};
+    constexpr Map config{connections, outputs};
     
     using Chip = nevresim::Chip<
         axon_count, neuron_count,

@@ -56,7 +56,7 @@ private:
     {
         return [](const Chip& chip, core_id_t core_id){
             return retrieve_signals<Chip::axon_count_>()(
-                chip, Chip::config_.core_sources_[core_id].sources_);
+                chip, Chip::mapping_.core_sources_[core_id].sources_);
         };
     }
 
@@ -67,7 +67,7 @@ public:
         return [](const Chip& chip){
             return 
                 retrieve_signals<Chip::output_size_>()(
-                    chip, Chip::config_.output_sources_);
+                    chip, Chip::mapping_.output_sources_);
         };
     }
 

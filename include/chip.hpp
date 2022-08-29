@@ -20,7 +20,7 @@ template<
     std::size_t CoreCount,
     std::size_t InputSize,
     std::size_t OutputSize,
-    ChipConfiguration<
+    Mapping<
         AxonCount,
         CoreCount,
         OutputSize> Configuration,
@@ -52,7 +52,7 @@ public:
     static constexpr std::size_t input_size_{InputSize};
     static constexpr std::size_t output_size_{OutputSize};
 
-    static constexpr ChipConfiguration config_ = Configuration;
+    static constexpr Mapping mapping_ = Configuration;
 
 public:
     constexpr 
