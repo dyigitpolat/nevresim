@@ -33,12 +33,12 @@ consteval auto generate_test_chip()
     using Map = nevresim::Mapping<
         axon_count, core_count, output_size>;
 
-    constexpr Map config{connections, outputs};
+    constexpr Map mapping{connections, outputs};
     
     using Chip = nevresim::Chip<
         axon_count, neuron_count,
         core_count, input_size,
-        output_size, config, leak,
+        output_size, mapping, leak,
         ExecutePolicy>;
 
     constexpr Chip chip{};
