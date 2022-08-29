@@ -25,10 +25,11 @@ public:
         const auto& compute_function,
         const auto& output_buffer_read_function)
     {
-        std::array<Weight<weight_t>, chip.output_size_> buffer{};
+        std::array<Weight<weight_t>, chip.config_.output_size_> buffer{};
         for(int i = 0; i < SimulationLength; ++i){
             chip.feed_input_buffer(
-                SpikeProvider<chip.input_size_>::generate_spikes(input));
+                SpikeProvider<chip.config_.input_size_>
+                    ::generate_spikes(input));
 
             compute_function(chip);
 
@@ -56,7 +57,7 @@ public:
         const auto& compute_function,
         const auto& output_buffer_read_function)
     {
-        for(std::size_t i = 0; i < chip.core_count_; ++i){
+        for(std::size_t i = 0; i < chip.config_.core_count_; ++i){
             chip.feed_input_buffer(input);
             compute_function(chip);
         }

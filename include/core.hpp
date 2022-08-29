@@ -13,17 +13,15 @@
 namespace nevresim {
 
 template <
-    std::size_t AxonCount,
-    std::size_t NeuronCount,
-    MembraneLeak<weight_t> LeakAmount,
+    typename Config,
     typename ComputePolicyBase
     >
 class Core
 {
     using signal_t = ComputePolicyBase::signal_t;
-    using neuron_t = Neuron<AxonCount, LeakAmount>;
-    using neurons_array_t = std::array<neuron_t, NeuronCount>;
-    using output_array_t = std::array<signal_t, NeuronCount>;
+    using neuron_t = Neuron<Config>;
+    using neurons_array_t = std::array<neuron_t, Config::neuron_count_>;
+    using output_array_t = std::array<signal_t, Config::neuron_count_>;
 
     neurons_array_t neurons_{};
     output_array_t output_{};
@@ -62,7 +60,7 @@ public:
     }
 
     constexpr
-    void load_weights(const CoreWeights<NeuronCount, AxonCount>& weights)
+    void load_weights(const CoreWeights<Config{}>& weights)
     {
         for(
             auto neuron_iter = std::begin(weights.neurons_); 

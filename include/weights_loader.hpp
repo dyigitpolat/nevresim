@@ -1,19 +1,18 @@
 #pragma once
 
+#include "chip_utilities.hpp"
 #include "chip_weights.hpp"
 #include "constants.hpp"
 #include "types.hpp"
 
 namespace nevresim {
 
-template <
-    std::size_t CoreCount,
-    std::size_t NeuronCount,
-    std::size_t AxonCount >
+template <ChipConfiguration Config>
 class WeightsLoader
 {
 public:
-    using chip_weights_t = ChipWeights<CoreCount, NeuronCount, AxonCount>;
+    using chip_weights_t = 
+        ChipWeights<Config>;
 
 public:
     chip_weights_t chip_weights_;

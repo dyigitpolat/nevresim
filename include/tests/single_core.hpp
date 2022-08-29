@@ -60,9 +60,9 @@ constexpr bool test_single_core()
         leak,
         SpikingExecution<4, DeterministicSpikeGenerator>> ();
 
-    using ChipW = ChipWeights<core_count, neuron_count, axon_count>;
-    using CoreW = CoreWeights<neuron_count, axon_count>;
-    using NeurW = NeuronWeights<axon_count>;
+    using ChipW = ChipWeights<chip.config_>;
+    using CoreW = CoreWeights<chip.config_>;
+    using NeurW = NeuronWeights<chip.config_>;
     using Ws = std::array<Weight<weight_t>, axon_count>;
     
     ChipW weights{{

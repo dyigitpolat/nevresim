@@ -12,12 +12,10 @@
 
 namespace nevresim {
 
-template <
-    std::size_t AxonCount,
-    MembraneLeak<weight_t> LeakAmount>
+template <typename Config>
 class Neuron
 {
-    using weights_array_t = std::array< Weight<weight_t>, AxonCount>;
+    using weights_array_t = std::array< Weight<weight_t>, Config::axon_count_>;
 
     weights_array_t weights_{};
     Threshold<weight_t> threshold_{};
@@ -32,7 +30,7 @@ class Neuron
                 std::begin(incoming_spikes), 
                 static_cast<MembranePotential<weight_t>>(0))
             + bias_ 
-            - LeakAmount;
+            - Config::leak_amount_;
     }
 
     constexpr spike_t fire()
@@ -67,7 +65,7 @@ public:
     }
 
     constexpr
-    void load_weights(const NeuronWeights<AxonCount>& weights)
+    void load_weights(const NeuronWeights<Config{}>& weights)
     {
         threshold_ = weights.threshold_;
         weights_ = weights.weights_;

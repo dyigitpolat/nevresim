@@ -129,7 +129,7 @@ void test_simple_generated_chip_spiking()
                 5000, nevresim::SpikeGenerator>>();
 
     nevresim::WeightsLoader<
-        chip.core_count_, chip.neuron_count_, chip.axon_count_> 
+        chip.config_> 
         weights_loader{};
     std::ifstream weights_stream("include/generated/simple_chip_weights.txt");
     if(weights_stream.is_open())

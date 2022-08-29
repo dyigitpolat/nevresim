@@ -55,7 +55,7 @@ private:
     static auto get_input_for() 
     {
         return [](const Chip& chip, core_id_t core_id){
-            return retrieve_signals<Chip::axon_count_>()(
+            return retrieve_signals<Chip::config_.axon_count_>()(
                 chip, Chip::mapping_.core_sources_[core_id].sources_);
         };
     }
@@ -66,7 +66,7 @@ public:
     {
         return [](const Chip& chip){
             return 
-                retrieve_signals<Chip::output_size_>()(
+                retrieve_signals<Chip::config_.output_size_>()(
                     chip, Chip::mapping_.output_sources_);
         };
     }
@@ -79,13 +79,13 @@ public:
             (Chip& chip_, std::index_sequence<IDs...>)
             {
                 std::array<
-                    std::array<SignalType, Chip::axon_count_>, 
-                    Chip::core_count_> axons{};
+                    std::array<SignalType, Chip::config_.axon_count_>, 
+                    Chip::config_.core_count_> axons{};
 
                 ((axons[IDs] = get_input_for()(chip_, IDs)), ...);
                 (chip_.get_cores()[IDs].compute(axons[IDs]), ...);
                 
-            } (chip, std::make_index_sequence<Chip::core_count_>{});
+            } (chip, std::make_index_sequence<Chip::config_.core_count_>{});
         };
     }
 };

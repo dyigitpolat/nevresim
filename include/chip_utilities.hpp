@@ -35,13 +35,12 @@ struct CoreConnection {
     std::array<SpikeSource, AxonCount> sources_{};
 };
 
-template<
-    std::size_t AxonCount,
-    std::size_t CoreCount,
-    std::size_t OutputSize>
+template<typename Config>
 struct Mapping {
-    std::array<CoreConnection<AxonCount>, CoreCount> core_sources_{};
-    std::array<SpikeSource, OutputSize> output_sources_{};
+    std::array<CoreConnection<Config::axon_count_>, Config::core_count_> 
+        core_sources_{};
+        
+    std::array<SpikeSource, Config::output_size_> output_sources_{};
 };
 
 } // namespace nevresim
