@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "constants.hpp"
-#include "types.hpp"
+#include "common/constants.hpp"
+#include "common/types.hpp"
 
 namespace nevresim {
 

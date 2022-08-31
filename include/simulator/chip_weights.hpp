@@ -1,8 +1,8 @@
 #pragma once
 
-#include "chip_utilities.hpp"
-#include "constants.hpp"
-#include "types.hpp"
+#include "simulator/chip_utilities.hpp"
+#include "common/constants.hpp"
+#include "common/types.hpp"
 
 #include <array>
 

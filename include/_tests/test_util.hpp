@@ -1,8 +1,8 @@
 #pragma once
 
-#include "chip.hpp"
-#include "types.hpp"
-#include "constants.hpp"
+#include "simulator/chip/chip.hpp"
+#include "common/types.hpp"
+#include "common/constants.hpp"
 
 #include <iostream>
 #include <iterator>

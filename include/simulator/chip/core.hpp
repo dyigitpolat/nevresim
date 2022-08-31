@@ -1,8 +1,8 @@
 #pragma once
 
-#include "chip_weights.hpp"
-#include "types.hpp"
-#include "neuron.hpp"
+#include "simulator/chip_weights.hpp"
+#include "common/types.hpp"
+#include "simulator/chip/neuron.hpp"
 
 #include <array>
 #include <ranges>

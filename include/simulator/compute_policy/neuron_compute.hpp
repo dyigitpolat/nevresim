@@ -1,7 +1,7 @@
 #pragma once
 
-#include "spiking_compute.hpp"
-#include "real_valued_compute.hpp"
+#include "simulator/compute_policy/spiking_compute.hpp"
+#include "simulator/compute_policy/real_valued_compute.hpp"
 
 #include <numeric>
 

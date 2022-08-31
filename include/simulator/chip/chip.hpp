@@ -1,11 +1,11 @@
 #pragma once
 
-#include "weights_loader.hpp"
-#include "constants.hpp"
-#include "types.hpp"
-#include "core.hpp"
-#include "chip_utilities.hpp"
-#include "chip_executor.hpp"
+#include "loaders/weights_loader.hpp"
+#include "common/constants.hpp"
+#include "common/types.hpp"
+#include "simulator/chip/core.hpp"
+#include "simulator/chip_utilities.hpp"
+#include "simulator/chip_executor.hpp"
 
 #include <array>
 #include <utility>

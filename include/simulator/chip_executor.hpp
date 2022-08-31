@@ -1,9 +1,9 @@
 #pragma once
 
-#include "input_loader.hpp"
-#include "spike_generator.hpp"
-#include "real_valued_compute.hpp"
-#include "spiking_compute.hpp"
+#include "loaders/input_loader.hpp"
+#include "simulator/spike_generation/spike_generator.hpp"
+#include "simulator/compute_policy/real_valued_compute.hpp"
+#include "simulator/compute_policy/spiking_compute.hpp"
 
 #include <algorithm>
 #include <cstddef>

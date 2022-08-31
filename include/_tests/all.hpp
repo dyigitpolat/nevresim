@@ -1,9 +1,9 @@
 #pragma once
 
-#include "tests/single_core.hpp"
-#include "tests/multi_core.hpp"
-#include "tests/real_valued_single_core.hpp"
-#include "tests/real_valued_multi_core.hpp"
+#include "_tests/single_core.hpp"
+#include "_tests/multi_core.hpp"
+#include "_tests/real_valued_single_core.hpp"
+#include "_tests/real_valued_multi_core.hpp"
 
 #include <iostream>
 

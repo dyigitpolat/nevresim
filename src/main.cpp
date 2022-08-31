@@ -1,23 +1,23 @@
-#include "demo_menu.hpp"
+#include "menu/demo_menu.hpp"
 
 #include <iostream> 
 #include <ranges> 
 #include <fstream>
 
-#include "neuron.hpp"
-#include "core.hpp"
-#include "chip.hpp"
-#include "input_loader.hpp"
-#include "weights_loader.hpp"
-#include "spike_generator.hpp"
-#include "chip_executor.hpp"
-#include "spiking_compute.hpp"
-#include "real_valued_compute.hpp"
+#include "simulator/chip/neuron.hpp"
+#include "simulator/chip/core.hpp"
+#include "simulator/chip/chip.hpp"
+#include "loaders/input_loader.hpp"
+#include "loaders/weights_loader.hpp"
+#include "simulator/spike_generation/spike_generator.hpp"
+#include "simulator/chip_executor.hpp"
+#include "simulator/compute_policy/spiking_compute.hpp"
+#include "simulator/compute_policy/real_valued_compute.hpp"
 
-#include "tests/all.hpp"
+#include "_tests/all.hpp"
 
 /*
-#include "generated/generate_chip.hpp"
+#include "_generated/generate_chip.hpp"
 void test_generated_chip()
 {
     static constinit auto chip = 
@@ -28,7 +28,7 @@ void test_generated_chip()
     nevresim::WeightsLoader<
         chip.core_count_, chip.neuron_count_, chip.axon_count_> 
         weights_loader{};
-    std::ifstream weights_stream("include/generated/chip_weights.txt");
+    std::ifstream weights_stream("include/_generated/chip_weights.txt");
     if(weights_stream.is_open())
     {
         weights_stream >> weights_loader;
@@ -80,7 +80,7 @@ void test_generated_chip_real()
     nevresim::WeightsLoader<
         chip.core_count_, chip.neuron_count_, chip.axon_count_> 
         weights_loader{};
-    std::ifstream weights_stream("include/generated/chip_weights.txt");
+    std::ifstream weights_stream("include/_generated/chip_weights.txt");
     if(weights_stream.is_open())
     {
         weights_stream >> weights_loader;
@@ -120,7 +120,7 @@ void test_generated_chip_real()
 */
 
 
-#include "generated/simple_generate_chip.hpp"
+#include "_generated/simple_generate_chip.hpp"
 void test_simple_generated_chip_spiking()
 {
     static constinit auto chip = 
@@ -131,7 +131,7 @@ void test_simple_generated_chip_spiking()
     nevresim::WeightsLoader<
         chip.config_> 
         weights_loader{};
-    std::ifstream weights_stream("include/generated/simple_chip_weights.txt");
+    std::ifstream weights_stream("include/_generated/simple_chip_weights.txt");
     if(weights_stream.is_open())
     {
         weights_stream >> weights_loader;

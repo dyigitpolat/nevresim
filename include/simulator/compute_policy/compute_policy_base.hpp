@@ -1,6 +1,6 @@
 #pragma once
 
-#include "chip_utilities.hpp"
+#include "simulator/chip_utilities.hpp"
 
 namespace nevresim 
 {

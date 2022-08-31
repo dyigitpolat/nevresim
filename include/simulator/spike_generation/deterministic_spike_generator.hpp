@@ -1,8 +1,8 @@
 #pragma once
 
-#include "constants.hpp"
-#include "types.hpp"
-#include "spike_generator.hpp"
+#include "common/constants.hpp"
+#include "common/types.hpp"
+#include "simulator/spike_generation/spike_generator.hpp"
 
 #include <algorithm>
 

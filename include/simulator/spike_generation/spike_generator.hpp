@@ -5,9 +5,9 @@
 #include <random>
 #include <cstddef>
 
-#include "constants.hpp"
-#include "types.hpp"
-#include "input_loader.hpp"
+#include "common/constants.hpp"
+#include "common/types.hpp"
+#include "loaders/input_loader.hpp"
 
 namespace nevresim {
 

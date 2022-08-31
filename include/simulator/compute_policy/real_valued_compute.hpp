@@ -1,6 +1,6 @@
 #pragma once
 
-#include "compute_policy_base.hpp"
+#include "simulator/compute_policy/compute_policy_base.hpp"
 namespace nevresim 
 {
 

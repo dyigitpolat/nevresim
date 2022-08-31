@@ -1,9 +1,9 @@
 #pragma once
 
-#include "chip_utilities.hpp"
-#include "chip_weights.hpp"
-#include "constants.hpp"
-#include "types.hpp"
+#include "simulator/chip_utilities.hpp"
+#include "simulator/chip_weights.hpp"
+#include "common/constants.hpp"
+#include "common/types.hpp"
 
 namespace nevresim {
 
