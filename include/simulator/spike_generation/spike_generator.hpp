@@ -1,13 +1,13 @@
 #pragma once
 
+#include "common/constants.hpp"
+#include "common/types.hpp"
+#include "loaders/input_loader.hpp"
+
 #include <array>
 #include <algorithm>
 #include <random>
 #include <cstddef>
-
-#include "common/constants.hpp"
-#include "common/types.hpp"
-#include "loaders/input_loader.hpp"
 
 namespace nevresim {
 
