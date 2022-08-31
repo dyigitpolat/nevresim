@@ -2,7 +2,6 @@
 
 #include "common/constants.hpp"
 #include "common/types.hpp"
-#include "simulator/spike_generation/spike_generator.hpp"
 
 #include <algorithm>
 
