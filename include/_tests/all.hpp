@@ -34,5 +34,5 @@ void run_all()
     report_result("real valued multi core", test_multi_real_valued_core);
 }
 
-}
-}
+} // namespace nevresim::tests
+} // namespace nevresim
