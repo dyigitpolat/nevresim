@@ -27,13 +27,8 @@ class Chip
     using core_t = Core<Config, typename compute_policy_t<Chip>::base_t>;
     using cores_array_t = 
         std::array<core_t, Config::core_count_>;
-    using input_buffer_t = 
-        std::array<
-            typename compute_policy_t<Chip>::signal_t, 
-            Config::input_size_>;
 
     cores_array_t cores_{};
-    input_buffer_t input_buffer_{};
 
 public:
     static constexpr Config config_ = Config{};
@@ -56,13 +51,7 @@ public:
             compute_policy_t<Chip>::generate_read_output_buffer()
         );
     }
-
-    constexpr
-    void feed_input_buffer(const auto& feed)
-    {
-        std::ranges::copy(feed, std::begin(input_buffer_)); 
-    }
-
+    
     constexpr
     void reset()
     {
@@ -87,12 +76,6 @@ public:
 
     constexpr
     cores_array_t& get_cores() { return cores_; } 
-
-    constexpr
-    const input_buffer_t& get_input_buffer() const { return input_buffer_; } 
-
-    constexpr
-    input_buffer_t& get_input_buffer() { return input_buffer_; } 
 };
 
 } // namespace nevresim

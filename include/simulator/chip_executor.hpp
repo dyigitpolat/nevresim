@@ -27,13 +27,13 @@ public:
     {
         std::array<Weight<weight_t>, chip.config_.output_size_> buffer{};
         for(int i = 0; i < SimulationLength; ++i){
-            chip.feed_input_buffer(
+            const auto& spikes{
                 SpikeProvider<chip.config_.input_size_>
-                    ::generate_spikes(input));
+                    ::generate_spikes(input)};
 
-            compute_function(chip);
+            compute_function(chip, spikes);
 
-            auto&& out = output_buffer_read_function(chip);
+            auto&& out = output_buffer_read_function(chip, spikes);
             std::ranges::transform(
                 std::ranges::cbegin(out), std::ranges::cend(out),
                 std::ranges::cbegin(buffer), std::ranges::cend(buffer),
@@ -58,11 +58,10 @@ public:
         const auto& output_buffer_read_function)
     {
         for(std::size_t i = 0; i < chip.config_.core_count_; ++i){
-            chip.feed_input_buffer(input);
-            compute_function(chip);
+            compute_function(chip, input);
         }
 
-        return output_buffer_read_function(chip);
+        return output_buffer_read_function(chip, input);
     }
 };
 
