@@ -28,6 +28,9 @@ void test_simple_generated_chip_spiking()
 
 int main()
 {
+    using namespace nevresim;
+    using namespace nevresim::tests;
+    
     //-----------------------------------------//
     std::cout << "- - - - - - - - - - - - - -\n";
     std::cout << "- - - - - - - - - - - - - -\n";
@@ -37,9 +40,6 @@ int main()
     //-----------------------------------------//
 
     DemoMenu main_menu("MAIN MENU");
-
-    using namespace nevresim;
-    using namespace nevresim::tests;
     
     main_menu.add_menu_item({run_all, "run all tests"});
     main_menu.add_menu_item({test_simple_generated_chip_spiking, 
