@@ -1,9 +1,10 @@
 #pragma once
 
-#include <vector>
-
 #include "common/constants.hpp"
 #include "common/types.hpp"
+
+#include <vector>
+#include <istream>
 
 namespace nevresim {
 

@@ -1,10 +1,5 @@
 #include "menu/demo_menu.hpp"
 
-#include "simulator/chip/neuron.hpp"
-#include "simulator/chip/core.hpp"
-#include "simulator/chip/chip.hpp"
-#include "loaders/input_loader.hpp"
-#include "loaders/weights_loader.hpp"
 #include "simulator/spike_generation/spike_generator.hpp"
 #include "simulator/chip_executor.hpp"
 #include "simulator/compute_policy/spiking_compute.hpp"
