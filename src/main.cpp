@@ -14,53 +14,22 @@
 #include "_generated/simple_generate_chip.hpp"
 
 #include <iostream> 
-#include <ranges> 
-#include <fstream>
+
+namespace nevresim
+{
 
 void test_simple_generated_chip_spiking()
 {
     static constinit auto chip = 
-        nevresim::generate_chip<
-            nevresim::SpikingExecution<
-                5000, nevresim::SpikeGenerator>>();
+        generate_chip<
+            SpikingExecution<
+                5000, SpikeGenerator>>();
 
-    nevresim::WeightsLoader<
-        chip.config_> 
-        weights_loader{};
-    std::ifstream weights_stream("include/_generated/simple_chip_weights.txt");
-    if(weights_stream.is_open())
-    {
-        weights_stream >> weights_loader;
-    }
-
-    chip.load_weights(weights_loader.chip_weights_);
-
-    int correct{};
-    int total{};
-    for(int idx = 0; idx < 4; ++idx)
-    {
-        nevresim::InputLoader input_loader{};
-        std::string fname = 
-            std::string{"inputs/simple_input_"} +
-            std::to_string(idx) +
-            std::string{".txt"};
-
-        std::ifstream input_stream(fname);
-        if(input_stream.is_open())
-        {
-            input_stream >> input_loader;
-        }
-        
-        auto buffer = chip.execute(input_loader.input_);
-
-        chip.reset();
-
-        nevresim::tests::print_prediction_summary(buffer);
-        int guess = nevresim::tests::argmax(buffer);
-        nevresim::tests::report_and_advance(
-            guess, input_loader.target_, idx, correct, total);
-    }
+    tests::load_weights(chip, "include/_generated/simple_chip_weights.txt");
+    tests::test_on_inputs(chip,"inputs/simple_input_", 4);
 }
+
+} // namespace nevresim
 
 int main()
 {
@@ -73,8 +42,11 @@ int main()
     //-----------------------------------------//
 
     DemoMenu main_menu("MAIN MENU");
+
+    using namespace nevresim;
+    using namespace nevresim::tests;
     
-    main_menu.add_menu_item({nevresim::tests::run_all, "run all tests"});
+    main_menu.add_menu_item({run_all, "run all tests"});
     main_menu.add_menu_item({test_simple_generated_chip_spiking, 
         "spiking test of generated XOR chip"});
     main_menu.show();

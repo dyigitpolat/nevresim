@@ -8,6 +8,7 @@
 #include <iterator>
 #include <algorithm>
 #include <limits>
+#include <fstream>
 
 namespace nevresim
 {
@@ -73,11 +74,11 @@ void report_and_advance(
     if(guess==target) correct++;
 
     std::cout 
-        << idx << " prediction: " << guess
+        << idx << ") prediction: " << guess
         << "\n";
 
     std::cout 
-        << idx << " target: " << target
+        << idx << ") target: " << target
         << "\n";
 
     std::cout << correct << "/" << total << "\n";
@@ -97,6 +98,57 @@ constexpr bool is_almost_equal(
 
     return absolute_difference < 
         (std::numeric_limits<FloatType>::epsilon() * 2);
+}
+
+void load_weights(auto& chip, auto weights_filename)
+{
+    WeightsLoader<
+        chip.config_> 
+        weights_loader{};
+
+    std::ifstream weights_stream(weights_filename);
+    if(weights_stream.is_open())
+    {
+        weights_stream >> weights_loader;
+    }
+
+    chip.load_weights(weights_loader.chip_weights_);
+}
+
+auto load_input_n(auto input_filename_prefix, int input_id)
+{
+    InputLoader input_loader{};
+    
+    std::string fname = 
+        std::string{input_filename_prefix} +
+        std::to_string(input_id) +
+        std::string{".txt"};
+
+    std::ifstream input_stream(fname);
+    if(input_stream.is_open())
+    {
+        input_stream >> input_loader;
+    }
+
+    return std::pair{input_loader.input_, input_loader.target_};
+}
+
+void test_on_inputs(auto& chip, auto input_filename_prefix, int input_count)
+{
+    int correct{};
+    int total{};
+    for(int idx = 0; idx < input_count; ++idx)
+    {
+        auto [input, target] = load_input_n(input_filename_prefix, idx);
+        auto buffer = chip.execute(input);
+
+        chip.reset();
+
+        print_prediction_summary(buffer);
+        int guess = argmax(buffer);
+        report_and_advance(
+            guess, target, idx, correct, total);
+    }
 }
 
 } // namespace nevresim::tests
