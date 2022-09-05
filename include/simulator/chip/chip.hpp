@@ -45,8 +45,8 @@ public:
     {
         static_assert(
             std::is_same_v<
-                typename decltype(executor)::compute_policy_t<Chip>,
-                compute_policy_t>);
+                typename decltype(executor)::compute_policy_t<Chip>::base_t,
+                typename compute_policy_t::base_t>);
 
         return executor.execute(
             input, 
