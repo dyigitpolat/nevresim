@@ -1,6 +1,6 @@
 #include "menu/demo_menu.hpp"
 
-#include "simulator/spike_generation/spike_generator.hpp"
+#include "simulator/spike_generation/stochastic_spike_generator.hpp"
 #include "simulator/chip_executor.hpp"
 #include "simulator/compute_policy/spiking_compute.hpp"
 #include "simulator/compute_policy/real_valued_compute.hpp"
@@ -18,7 +18,7 @@ void test_simple_generated_chip_spiking()
     static constinit auto chip = 
         generate_chip<
             SpikingExecution<
-                5000, SpikeGenerator>>();
+                5000, StochasticSpikeGenerator>>();
 
     tests::load_weights(chip, "include/_generated/simple_chip_weights.txt");
     tests::test_on_inputs(chip,"inputs/simple_input_", 4);

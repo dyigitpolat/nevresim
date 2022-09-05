@@ -12,7 +12,7 @@
 namespace nevresim {
 
 template <std::size_t InputSize>
-class SpikeGenerator
+class StochasticSpikeGenerator
 {
 public:
     using spike_source_t = std::array<spike_t, InputSize>;

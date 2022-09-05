@@ -1,7 +1,7 @@
 #pragma once
 
 #include "loaders/input_loader.hpp"
-#include "simulator/spike_generation/spike_generator.hpp"
+#include "simulator/spike_generation/stochastic_spike_generator.hpp"
 #include "simulator/compute_policy/real_valued_compute.hpp"
 #include "simulator/compute_policy/spiking_compute.hpp"
 
