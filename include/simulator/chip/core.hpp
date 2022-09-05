@@ -14,11 +14,11 @@ namespace nevresim {
 
 template <
     typename Config,
-    typename ComputePolicyBase
+    typename ComputePolicy
     >
 class Core
 {
-    using signal_t = ComputePolicyBase::signal_t;
+    using signal_t = ComputePolicy::signal_t;
     using neuron_t = Neuron<Config>;
     using neurons_array_t = std::array<neuron_t, Config::neuron_count_>;
     using output_array_t = std::array<signal_t, Config::neuron_count_>;
@@ -44,7 +44,7 @@ public:
         std::ranges::transform(
             neurons_, std::ranges::begin(output_),
             [&](auto& neuron) { 
-                return neuron.template compute<ComputePolicyBase>
+                return neuron.template compute<ComputePolicy>
                     (incoming_signals); 
             }
         );
