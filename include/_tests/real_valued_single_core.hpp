@@ -60,7 +60,7 @@ constexpr bool test_single_real_valued_core()
         input_size,
         output_size,
         leak,
-        RealExecution> ();
+        ConcreteRealValuedCompute> ();
 
     using ChipW = ChipWeights<chip.config_>;
     using CoreW = CoreWeights<chip.config_>;
@@ -78,7 +78,7 @@ constexpr bool test_single_real_valued_core()
 
     std::array<raw_input_t, 3> input{1.0, 0.5, 0.3};
         
-    auto buffer = chip.execute(input);
+    auto buffer = chip.execute(input, RealExecution{});
 
     chip.reset();
     return 

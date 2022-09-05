@@ -66,7 +66,7 @@ constexpr bool test_3_core_2x2()
         input_size,
         output_size,
         leak,
-        SpikingExecution<12, DeterministicSpikeGenerator>> ();
+        ConcreteSpikingCompute> ();
 
     using ChipW = ChipWeights<chip.config_>;
     using CoreW = CoreWeights<chip.config_>;
@@ -88,7 +88,8 @@ constexpr bool test_3_core_2x2()
 
     std::array<raw_input_t, 2> input{1.0, 1.0};
         
-    auto buffer = chip.execute(input);
+    auto buffer = chip.execute(
+        input, SpikingExecution<12, DeterministicSpikeGenerator>{});
 
     chip.reset();
     return buffer == std::array<Weight<weight_t>, 4>{1, 0, 0, 1};

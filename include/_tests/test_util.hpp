@@ -27,7 +27,7 @@ template <
     std::size_t input_size,
     std::size_t output_size,
     nevresim::MembraneLeak<weight_t> leak,
-    typename ExecutePolicy
+    template <typename> typename ConcreteComputePolicy
 >
 consteval auto generate_test_chip()
 {
@@ -45,7 +45,7 @@ consteval auto generate_test_chip()
 
     constexpr Map mapping{connections, outputs};
     
-    using Chip = Chip<Cfg, mapping, ExecutePolicy>;
+    using Chip = Chip<Cfg, mapping, ConcreteComputePolicy>;
 
     constexpr Chip chip{};
     return chip;
@@ -133,14 +133,18 @@ auto load_input_n(auto input_filename_prefix, int input_id)
     return std::pair{input_loader.input_, input_loader.target_};
 }
 
-void test_on_inputs(auto& chip, auto input_filename_prefix, int input_count)
+void test_on_inputs(
+    auto& chip, 
+    auto input_filename_prefix, 
+    int input_count, 
+    auto executor)
 {
     int correct{};
     int total{};
     for(int idx = 0; idx < input_count; ++idx)
     {
         auto [input, target] = load_input_n(input_filename_prefix, idx);
-        auto buffer = chip.execute(input);
+        auto buffer = chip.execute(input, executor);
 
         chip.reset();
 

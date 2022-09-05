@@ -16,12 +16,14 @@ namespace nevresim
 void test_simple_generated_chip_spiking()
 {
     static constinit auto chip = 
-        generate_chip<
-            SpikingExecution<
-                5000, StochasticSpikeGenerator>>();
+        generate_chip<ConcreteSpikingCompute>();
+    
+    ChipExecutor<SpikingExecution<5000, StochasticSpikeGenerator>> executor_1;
+    ChipExecutor<SpikingExecution<100000, StochasticSpikeGenerator>> executor_2;
 
     tests::load_weights(chip, "include/_generated/simple_chip_weights.txt");
-    tests::test_on_inputs(chip,"inputs/simple_input_", 4);
+    tests::test_on_inputs(chip,"inputs/simple_input_", 4, executor_1);
+    tests::test_on_inputs(chip,"inputs/simple_input_", 4, executor_2);
 }
 
 } // namespace nevresim

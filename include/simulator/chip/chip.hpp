@@ -11,20 +11,18 @@
 #include <utility>
 #include <cstddef>
 #include <istream>
+#include <type_traits>
 
 namespace nevresim {
 
 template<
     typename Config,
     Mapping<Config> mapping,
-    typename ExecutePolicy
+    template <typename C> typename ConcreteComputePolicy
     >
 class Chip
 {
-    template <typename C>
-    using compute_policy_t = typename ExecutePolicy::compute_policy_t<C>;
-
-    using core_t = Core<Config, typename compute_policy_t<Chip>::base_t>;
+    using core_t = Core<Config, typename ConcreteComputePolicy<Chip>::base_t>;
     using cores_array_t = 
         std::array<core_t, Config::core_count_>;
 
@@ -42,13 +40,18 @@ public:
     Chip() : cores_{} {}
     
     constexpr 
-    auto execute(const auto& input)
+    auto execute(const auto& input, auto executor)
     {
-        return ChipExecutor<ExecutePolicy>::execute(
+        static_assert(
+            std::is_same_v<
+                typename decltype(executor)::compute_policy_t<Chip>,
+                ConcreteComputePolicy<Chip>>);
+
+        return executor.execute(
             input, 
             *this, 
-            compute_policy_t<Chip>::generate_compute(), 
-            compute_policy_t<Chip>::generate_read_output_buffer()
+            ConcreteComputePolicy<Chip>::generate_compute(), 
+            ConcreteComputePolicy<Chip>::generate_read_output_buffer()
         );
     }
     

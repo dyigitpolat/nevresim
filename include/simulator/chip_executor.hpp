@@ -69,6 +69,9 @@ template <typename ExecutePolicy>
 class ChipExecutor
 {
 public:
+    template <typename C>
+    using compute_policy_t = typename ExecutePolicy::compute_policy_t<C>;
+
     constexpr static auto execute(
         const auto& input, 
         auto& chip,
