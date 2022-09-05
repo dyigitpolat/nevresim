@@ -5,18 +5,18 @@
 namespace nevresim 
 {
 
-class SpikingComputeBase
+class SpikingCompute
 {
 public: 
     using signal_t = spike_t;
-    using base_t = SpikingComputeBase;
+    using base_t = SpikingCompute;
 
 };
 
 template <typename Chip>
-class SpikingCompute :
-    public SpikingComputeBase, 
-    public ComputePolicyBase<Chip, SpikingComputeBase::signal_t>
+class ConcreteSpikingCompute :
+    public SpikingCompute, 
+    public ComputePolicyBase<Chip, SpikingCompute::signal_t>
 {};
 
 } // namespace nevresim

@@ -17,7 +17,7 @@ class SpikingExecution
 {
 public:
     template <typename C>
-    using compute_policy_t = SpikingCompute<C>;
+    using compute_policy_t = ConcreteSpikingCompute<C>;
 
     constexpr static auto execute(
         const auto& input, 
@@ -49,7 +49,7 @@ class RealExecution
 {
 public:
     template <typename C>
-    using compute_policy_t = RealValuedCompute<C>;
+    using compute_policy_t = ConcreteRealValuedCompute<C>;
 
     constexpr static auto execute(
         const auto& input, 

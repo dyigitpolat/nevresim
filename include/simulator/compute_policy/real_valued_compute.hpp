@@ -4,17 +4,17 @@
 namespace nevresim 
 {
 
-class RealValuedComputeBase
+class RealValuedCompute
 {
 public: 
     using signal_t = MembranePotential<weight_t>;
-    using base_t = RealValuedComputeBase;
+    using base_t = RealValuedCompute;
 };
 
 template <typename Chip>
-class RealValuedCompute : 
-    public RealValuedComputeBase, 
-    public ComputePolicyBase<Chip, RealValuedComputeBase::signal_t>
+class ConcreteRealValuedCompute : 
+    public RealValuedCompute, 
+    public ComputePolicyBase<Chip, RealValuedCompute::signal_t>
 {};
 
 } // namespace nevresim
