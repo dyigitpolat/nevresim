@@ -22,7 +22,8 @@ template<
     >
 class Chip
 {
-    using core_t = Core<Config, typename ConcreteComputePolicy<Chip>::base_t>;
+    using compute_policy_t = ConcreteComputePolicy<Chip>;
+    using core_t = Core<Config, typename compute_policy_t::base_t>;
     using cores_array_t = 
         std::array<core_t, Config::core_count_>;
 
@@ -45,13 +46,13 @@ public:
         static_assert(
             std::is_same_v<
                 typename decltype(executor)::compute_policy_t<Chip>,
-                ConcreteComputePolicy<Chip>>);
+                compute_policy_t>);
 
         return executor.execute(
             input, 
             *this, 
-            ConcreteComputePolicy<Chip>::generate_compute(), 
-            ConcreteComputePolicy<Chip>::generate_read_output_buffer()
+            compute_policy_t::generate_compute(), 
+            compute_policy_t::generate_read_output_buffer()
         );
     }
     
