@@ -1,7 +1,7 @@
 #include "menu/demo_menu.hpp"
 
 #include "simulator/spike_generation/stochastic_spike_generator.hpp"
-#include "simulator/chip_executor.hpp"
+#include "simulator/execution/spiking_execution.hpp"
 #include "simulator/compute_policy/spiking_compute.hpp"
 #include "simulator/compute_policy/real_valued_compute.hpp"
 

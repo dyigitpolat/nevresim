@@ -5,7 +5,7 @@
 #include "common/types.hpp"
 #include "simulator/chip/core.hpp"
 #include "simulator/chip_utilities.hpp"
-#include "simulator/chip_executor.hpp"
+#include "simulator/execution/chip_executor.hpp"
 
 #include <array>
 #include <utility>

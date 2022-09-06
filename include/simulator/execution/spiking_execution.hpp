@@ -1,6 +1,5 @@
 #pragma once
 
-#include "simulator/compute_policy/real_valued_compute.hpp"
 #include "simulator/compute_policy/spiking_compute.hpp"
 
 #include <algorithm>
@@ -39,40 +38,6 @@ public:
         }
 
         return buffer;
-    }
-};
-
-class RealExecution
-{
-public:
-    using compute_policy_t = RealValuedCompute;
-
-    constexpr static auto execute(
-        const auto& input, 
-        auto& chip,
-        const auto& compute_function,
-        const auto& output_buffer_read_function)
-    {
-        for(std::size_t i = 0; i < chip.config_.core_count_; ++i){
-            compute_function(chip, input);
-        }
-
-        return output_buffer_read_function(chip, input);
-    }
-};
-
-template <typename ExecutePolicy>
-class ChipExecutor
-{
-public:
-    constexpr static auto execute(
-        const auto& input, 
-        auto& chip,
-        const auto& compute_function,
-        const auto& output_buffer_read_function)
-    {
-        return ExecutePolicy::execute(
-            input, chip, compute_function, output_buffer_read_function);
     }
 };
 

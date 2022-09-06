@@ -4,6 +4,7 @@
 #include "simulator/chip/core.hpp"
 #include "simulator/chip/chip.hpp"
 #include "simulator/compute_policy/real_valued_compute.hpp"
+#include "simulator/execution/real_valued_execution.hpp"
 
 #include "test_util.hpp"
 
