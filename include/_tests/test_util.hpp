@@ -133,18 +133,18 @@ auto load_input_n(auto input_filename_prefix, int input_id)
     return std::pair{input_loader.input_, input_loader.target_};
 }
 
+template <typename ExecutionPolicy>
 void test_on_inputs(
     auto& chip, 
     auto input_filename_prefix, 
-    int input_count, 
-    auto executor)
+    int input_count)
 {
     int correct{};
     int total{};
     for(int idx = 0; idx < input_count; ++idx)
     {
         auto [input, target] = load_input_n(input_filename_prefix, idx);
-        auto buffer = chip.execute(input, executor);
+        auto buffer = chip.template execute<ExecutionPolicy>(input);
 
         chip.reset();
 

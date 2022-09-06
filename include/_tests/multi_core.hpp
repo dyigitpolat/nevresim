@@ -88,8 +88,8 @@ constexpr bool test_3_core_2x2()
 
     std::array<raw_input_t, 2> input{1.0, 1.0};
         
-    auto buffer = chip.execute(
-        input, SpikingExecution<12, DeterministicSpikeGenerator>{});
+    auto buffer = 
+        chip.execute<SpikingExecution<12, DeterministicSpikeGenerator>>(input);
 
     chip.reset();
     return buffer == std::array<Weight<weight_t>, 4>{1, 0, 0, 1};

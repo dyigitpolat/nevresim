@@ -40,15 +40,16 @@ public:
     constexpr 
     Chip() : cores_{} {}
     
+    template <typename ExecutionPolicy>
     constexpr 
-    auto execute(const auto& input, auto executor)
+    auto execute(const auto& input)
     {
         static_assert(
             std::is_same_v<
-                typename decltype(executor)::compute_policy_t<Chip>::base_t,
+                typename ExecutionPolicy::compute_policy_t<Chip>::base_t,
                 typename compute_policy_t::base_t>);
 
-        return executor.execute(
+        return ChipExecutor<ExecutionPolicy>::execute(
             input, 
             *this, 
             compute_policy_t::generate_compute(), 

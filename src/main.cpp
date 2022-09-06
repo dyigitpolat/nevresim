@@ -18,12 +18,12 @@ void test_simple_generated_chip_spiking()
     static constinit auto chip = 
         generate_chip<ConcreteSpikingCompute>();
     
-    ChipExecutor<SpikingExecution<5000, StochasticSpikeGenerator>> executor_1;
-    ChipExecutor<SpikingExecution<100000, StochasticSpikeGenerator>> executor_2;
+    using spiking_5000 = SpikingExecution<5000, StochasticSpikeGenerator>;
+    using spiking_100000 = SpikingExecution<100000, StochasticSpikeGenerator>;
 
     tests::load_weights(chip, "include/_generated/simple_chip_weights.txt");
-    tests::test_on_inputs(chip,"inputs/simple_input_", 4, executor_1);
-    tests::test_on_inputs(chip,"inputs/simple_input_", 4, executor_2);
+    tests::test_on_inputs<spiking_5000>(chip,"inputs/simple_input_", 4);
+    tests::test_on_inputs<spiking_100000>(chip,"inputs/simple_input_", 4);
 }
 
 } // namespace nevresim

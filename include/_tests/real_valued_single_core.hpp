@@ -78,7 +78,7 @@ constexpr bool test_single_real_valued_core()
 
     std::array<raw_input_t, 3> input{1.0, 0.5, 0.3};
         
-    auto buffer = chip.execute(input, RealExecution{});
+    auto buffer = chip.execute<RealExecution>(input);
 
     chip.reset();
     return 
