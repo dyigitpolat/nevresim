@@ -3,9 +3,6 @@
 #include "simulator/chip/neuron.hpp"
 #include "simulator/chip/core.hpp"
 #include "simulator/chip/chip.hpp"
-#include "loaders/input_loader.hpp"
-#include "loaders/weights_loader.hpp"
-#include "simulator/spike_generation/deterministic_spike_generator.hpp"
 #include "simulator/compute_policy/real_valued_compute.hpp"
 
 #include "test_util.hpp"
