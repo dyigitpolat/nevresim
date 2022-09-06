@@ -6,7 +6,7 @@
 
 namespace nevresim {
 
-class RealExecution
+class RealValuedExecution
 {
 public:
     using compute_policy_t = RealValuedCompute;
