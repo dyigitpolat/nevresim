@@ -46,8 +46,7 @@ public:
     {
         static_assert(
             std::is_same_v<
-                typename ExecutionPolicy::compute_policy_t,
-                ComputePolicy>);
+                typename ExecutionPolicy::compute_policy_t, ComputePolicy>);
 
         return ChipExecutor<ExecutionPolicy>::execute(
             input, 
