@@ -16,7 +16,7 @@ namespace nevresim
 void test_simple_generated_chip_spiking()
 {
     static constinit auto chip = 
-        generate_chip<ConcreteSpikingCompute>();
+        generate_chip<SpikingCompute>();
     
     using spiking_5000 = SpikingExecution<5000, StochasticSpikeGenerator>;
     using spiking_100000 = SpikingExecution<100000, StochasticSpikeGenerator>;

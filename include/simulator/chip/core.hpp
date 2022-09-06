@@ -18,7 +18,7 @@ template <
     >
 class Core
 {
-    using signal_t = ComputePolicy::signal_t;
+    using signal_t = typename ComputePolicy::signal_t;
     using neuron_t = Neuron<Config>;
     using neurons_array_t = std::array<neuron_t, Config::neuron_count_>;
     using output_array_t = std::array<signal_t, Config::neuron_count_>;

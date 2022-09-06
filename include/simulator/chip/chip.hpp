@@ -18,12 +18,12 @@ namespace nevresim {
 template<
     typename Config,
     Mapping<Config> mapping,
-    template <typename C> typename ConcreteComputePolicy
+    typename ComputePolicy
     >
 class Chip
 {
-    using compute_policy_t = ConcreteComputePolicy<Chip>;
-    using core_t = Core<Config, typename compute_policy_t::base_t>;
+    using concrete_policy_t = typename ComputePolicy::concrete_policy_t<Chip>;
+    using core_t = Core<Config, ComputePolicy>;
     using cores_array_t = 
         std::array<core_t, Config::core_count_>;
 
@@ -46,14 +46,14 @@ public:
     {
         static_assert(
             std::is_same_v<
-                typename ExecutionPolicy::compute_policy_t<Chip>::base_t,
-                typename compute_policy_t::base_t>);
+                typename ExecutionPolicy::compute_policy_t,
+                ComputePolicy>);
 
         return ChipExecutor<ExecutionPolicy>::execute(
             input, 
             *this, 
-            compute_policy_t::generate_compute(), 
-            compute_policy_t::generate_read_output_buffer()
+            concrete_policy_t::generate_compute(), 
+            concrete_policy_t::generate_read_output_buffer()
         );
     }
     

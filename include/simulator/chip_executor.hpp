@@ -1,7 +1,5 @@
 #pragma once
 
-#include "loaders/input_loader.hpp"
-#include "simulator/spike_generation/stochastic_spike_generator.hpp"
 #include "simulator/compute_policy/real_valued_compute.hpp"
 #include "simulator/compute_policy/spiking_compute.hpp"
 
@@ -16,8 +14,7 @@ template <
 class SpikingExecution
 {
 public:
-    template <typename C>
-    using compute_policy_t = ConcreteSpikingCompute<C>;
+    using compute_policy_t = SpikingCompute;
 
     constexpr static auto execute(
         const auto& input, 
@@ -48,8 +45,7 @@ public:
 class RealExecution
 {
 public:
-    template <typename C>
-    using compute_policy_t = ConcreteRealValuedCompute<C>;
+    using compute_policy_t = RealValuedCompute;
 
     constexpr static auto execute(
         const auto& input, 

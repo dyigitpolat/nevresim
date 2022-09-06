@@ -66,7 +66,7 @@ constexpr bool test_3_core_2x2()
         input_size,
         output_size,
         leak,
-        ConcreteSpikingCompute> ();
+        SpikingCompute> ();
 
     using ChipW = ChipWeights<chip.config_>;
     using CoreW = CoreWeights<chip.config_>;

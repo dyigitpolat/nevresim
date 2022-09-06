@@ -60,7 +60,7 @@ constexpr bool test_multi_real_valued_core()
         input_size,
         output_size,
         leak,
-        ConcreteRealValuedCompute> ();
+        RealValuedCompute> ();
 
     using ChipW = ChipWeights<chip.config_>;
     using CoreW = CoreWeights<chip.config_>;

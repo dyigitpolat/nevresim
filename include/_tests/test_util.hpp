@@ -27,7 +27,7 @@ template <
     std::size_t input_size,
     std::size_t output_size,
     nevresim::MembraneLeak<weight_t> leak,
-    template <typename> typename ConcreteComputePolicy
+    typename ComputePolicy
 >
 consteval auto generate_test_chip()
 {
@@ -45,7 +45,7 @@ consteval auto generate_test_chip()
 
     constexpr Map mapping{connections, outputs};
     
-    using Chip = Chip<Cfg, mapping, ConcreteComputePolicy>;
+    using Chip = Chip<Cfg, mapping, ComputePolicy>;
 
     constexpr Chip chip{};
     return chip;
