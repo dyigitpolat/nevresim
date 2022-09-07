@@ -15,6 +15,7 @@ template <typename Config>
 class NeuronCompute<Config, RealValuedCompute>
 {
     using weights_array_t = std::array<Weight<weight_t>, Config::axon_count_>;
+    using signal_t = typename RealValuedCompute::signal_t;
 
     weights_array_t weights_{};
     Bias<weight_t> bias_{};
@@ -24,11 +25,11 @@ public:
     operator()(const auto& incoming_signal)
     {
         return std::max(
-            static_cast<RealValuedCompute::signal_t>(0), 
+            signal_t{0}, 
             std::inner_product(
                 std::begin(weights_), std::end(weights_),
                 std::begin(incoming_signal), 
-                static_cast<RealValuedCompute::signal_t>(0)
+                signal_t{0}
             ) + bias_);
     }
 
