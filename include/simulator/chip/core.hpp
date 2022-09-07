@@ -19,7 +19,7 @@ template <
 class Core
 {
     using signal_t = typename ComputePolicy::signal_t;
-    using neuron_t = Neuron<Config>;
+    using neuron_t = Neuron<Config, ComputePolicy>;
     using neurons_array_t = std::array<neuron_t, Config::neuron_count_>;
     using output_array_t = std::array<signal_t, Config::neuron_count_>;
 
@@ -44,8 +44,7 @@ public:
         std::ranges::transform(
             neurons_, std::ranges::begin(output_),
             [&](auto& neuron) { 
-                return neuron.template compute<ComputePolicy>
-                    (incoming_signals); 
+                return neuron.compute(incoming_signals); 
             }
         );
     }
