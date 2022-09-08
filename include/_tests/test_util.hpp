@@ -1,10 +1,13 @@
 #pragma once
 
 #include "simulator/chip/chip.hpp"
+#include "loaders/input_loader.hpp"
+#include "loaders/weights_loader.hpp"
 #include "common/types.hpp"
 #include "common/constants.hpp"
 
 #include <iostream>
+#include <utility>
 #include <iterator>
 #include <algorithm>
 #include <limits>
@@ -67,23 +70,32 @@ int argmax(const auto& buffer)
         std::max_element(buffer.begin(), buffer.end()));
 }
 
-void report_and_advance(
-    int guess, int target, int idx, int& correct, int& total)
+void advance(
+    int guess, int target, int& correct, int& total)
 {
     total++;
     if(guess==target) correct++;
+}
 
-    std::cout 
-        << idx << ") prediction: " << guess
-        << "\n";
+void report_and_advance(
+    int guess, int target, int idx, int& correct, int& total, 
+    bool verbose = false)
+{
+    advance(guess, target, correct, total);
 
-    std::cout 
-        << idx << ") target: " << target
-        << "\n";
+    if(verbose) {
+        std::cout 
+            << idx << ") prediction: " << guess
+            << "\n";
 
-    std::cout << correct << "/" << total << "\n";
+        std::cout 
+            << idx << ") target: " << target
+            << "\n";
 
-    std::cout << "\n";
+        std::cout << correct << "/" << total << "\n";
+
+        std::cout << "\n";
+    }
 }
 
 template <typename FloatType>
@@ -134,10 +146,11 @@ auto load_input_n(auto input_filename_prefix, int input_id)
 }
 
 template <typename ExecutionPolicy>
-void test_on_inputs(
+auto test_on_inputs(
     auto& chip, 
     auto input_filename_prefix, 
-    int input_count)
+    int input_count,
+    bool verbose = false)
 {
     int correct{};
     int total{};
@@ -148,11 +161,22 @@ void test_on_inputs(
 
         chip.reset();
 
-        print_prediction_summary(buffer);
+        if (verbose) print_prediction_summary(buffer);
         int guess = argmax(buffer);
         report_and_advance(
-            guess, target, idx, correct, total);
+            guess, target, idx, correct, total, verbose);
     }
+
+    return std::pair{correct, total};
+}
+
+void report_result(auto title, auto test)
+{
+    std::cout << title << ": ";
+    if(test()) 
+        std::cout << "PASS\n";
+    else 
+        std::cout << "FAIL\n";
 }
 
 } // namespace nevresim::tests

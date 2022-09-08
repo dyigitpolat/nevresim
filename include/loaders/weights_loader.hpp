@@ -5,6 +5,8 @@
 #include "common/constants.hpp"
 #include "common/types.hpp"
 
+#include <istream>
+
 namespace nevresim {
 
 template <ChipConfiguration Config>

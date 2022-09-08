@@ -6,6 +6,7 @@
 #include "simulator/spike_generation/deterministic_spike_generator.hpp"
 #include "simulator/compute_policy/spiking_compute.hpp"
 #include "simulator/execution/spiking_execution.hpp"
+#include "simulator/chip_utilities.hpp"
 
 #include "test_util.hpp"
 

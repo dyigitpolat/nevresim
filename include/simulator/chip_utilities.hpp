@@ -2,6 +2,8 @@
 
 #include "common/types.hpp"
 
+#include <array>
+
 namespace nevresim
 {
 
