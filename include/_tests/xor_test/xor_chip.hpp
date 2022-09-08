@@ -5,10 +5,7 @@
 #include "simulator/chip/core.hpp"
 #include "simulator/chip/chip.hpp"
 
-namespace nevresim
-{
-
-namespace tests
+namespace nevresim::tests
 {
 
 template <typename Con, typename Src, size_t core_count, size_t in, size_t off>
@@ -78,4 +75,3 @@ consteval auto generate_xor_chip()
 }
 
 } // namespace nevresim::tests
-} // namespace nevresim

@@ -10,10 +10,7 @@
 
 #include <iostream> 
 
-namespace nevresim
-{
-
-namespace tests
+namespace nevresim::tests
 {
 
 bool test_xor()
@@ -33,4 +30,3 @@ bool test_xor()
 }
 
 } // namespace nevresim::tests
-} // namespace nevresim
