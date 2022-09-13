@@ -70,32 +70,18 @@ int argmax(const auto& buffer)
         std::max_element(buffer.begin(), buffer.end()));
 }
 
-void advance(
-    int guess, int target, int& correct, int& total)
+void report(
+    int guess, int target, int idx, int& correct, int& total)
 {
-    total++;
-    if(guess==target) correct++;
-}
+    std::cout 
+        << idx << ") prediction: " << guess
+        << "\n";
 
-void report_and_advance(
-    int guess, int target, int idx, int& correct, int& total, 
-    bool verbose = false)
-{
-    advance(guess, target, correct, total);
+    std::cout 
+        << idx << ") target: " << target
+        << "\n";
 
-    if(verbose) {
-        std::cout 
-            << idx << ") prediction: " << guess
-            << "\n";
-
-        std::cout 
-            << idx << ") target: " << target
-            << "\n";
-
-        std::cout << correct << "/" << total << "\n";
-
-        std::cout << "\n";
-    }
+    std::cout << correct << "/" << total << "\n";
 }
 
 template <typename FloatType>
@@ -145,6 +131,16 @@ auto load_input_n(auto input_filename_prefix, int input_id)
     return std::pair{input_loader.input_, input_loader.target_};
 }
 
+void print_details(
+    const auto& buffer, 
+    int guess, int target, int idx, 
+    int& correct, int& total)
+{
+    std::cout << "\n\n";
+    print_prediction_summary(buffer);
+    report(guess, target, idx, correct, total);
+}
+
 template <typename ExecutionPolicy>
 auto test_on_inputs(
     auto& chip, 
@@ -158,13 +154,14 @@ auto test_on_inputs(
     {
         auto [input, target] = load_input_n(input_filename_prefix, idx);
         auto buffer = chip.template execute<ExecutionPolicy>(input);
-
         chip.reset();
 
-        if (verbose) print_prediction_summary(buffer);
         int guess = argmax(buffer);
-        report_and_advance(
-            guess, target, idx, correct, total, verbose);
+
+        total++;
+        if(guess==target) correct++;
+
+        if (verbose) print_details(buffer, guess, target, idx, correct, total);
     }
 
     return std::pair{correct, total};
