@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <limits>
 #include <fstream>
+#include <memory>
 
 namespace nevresim
 {
@@ -100,22 +101,21 @@ constexpr bool is_almost_equal(
 
 void load_weights(auto& chip, auto weights_filename)
 {
-    WeightsLoader<
-        chip.config_> 
-        weights_loader{};
+    std::unique_ptr<WeightsLoader<chip.config_>>
+        weights_loader_ptr{new WeightsLoader<chip.config_>{}};
 
     std::ifstream weights_stream(weights_filename);
     if(weights_stream.is_open())
     {
-        weights_stream >> weights_loader;
+        weights_stream >> *weights_loader_ptr;
     }
 
-    chip.load_weights(weights_loader.chip_weights_);
+    chip.load_weights(weights_loader_ptr->chip_weights_);
 }
 
 auto load_input_n(auto input_filename_prefix, int input_id)
 {
-    InputLoader input_loader{};
+    std::unique_ptr<InputLoader> input_loader_ptr{new InputLoader{}};
     
     std::string fname = 
         std::string{input_filename_prefix} +
@@ -125,10 +125,10 @@ auto load_input_n(auto input_filename_prefix, int input_id)
     std::ifstream input_stream(fname);
     if(input_stream.is_open())
     {
-        input_stream >> input_loader;
+        input_stream >> *input_loader_ptr;
     }
 
-    return std::pair{input_loader.input_, input_loader.target_};
+    return std::pair{input_loader_ptr->input_, input_loader_ptr->target_};
 }
 
 void print_details(
