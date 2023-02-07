@@ -57,7 +57,7 @@ constexpr bool test_single_core()
         input_size,
         output_size,
         leak,
-        SpikingCompute> ();
+        SpikingCompute<>> ();
 
     using ChipW = ChipWeights<chip.config_>;
     using CoreW = CoreWeights<chip.config_>;

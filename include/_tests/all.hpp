@@ -26,6 +26,7 @@ void run_all()
     report_result("real valued single core", test_single_real_valued_core);
     report_result("real valued multi core", test_multi_real_valued_core);
     report_result("xor test", test_xor);
+    report_result("xor test novena fire", test_xor_novena);
 }
 
 } // namespace nevresim::tests

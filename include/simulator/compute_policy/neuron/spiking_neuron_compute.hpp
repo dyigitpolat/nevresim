@@ -1,6 +1,7 @@
 #pragma once
 
 #include "simulator/compute_policy/spiking_compute.hpp"
+#include "simulator/compute_policy/fire_policy/default_fire.hpp"
 #include "simulator/chip_weights.hpp"
 #include "common/types.hpp"
 
@@ -11,8 +12,8 @@ namespace nevresim {
 template <typename Config, typename ComputePolicy>
 struct NeuronCompute;
 
-template <typename Config>
-class NeuronCompute<Config, SpikingCompute>
+template <typename Config, typename FirePolicy>
+class NeuronCompute<Config, SpikingCompute<FirePolicy>>
 {
     using weights_array_t = std::array<Weight<weight_t>, Config::axon_count_>;
 
@@ -34,18 +35,11 @@ class NeuronCompute<Config, SpikingCompute>
 
     constexpr spike_t fire()
     {
-        spike_t spike = threshold_ < membrane_potential_;
-
-        if(spike)
-        {
-            membrane_potential_ -= threshold_;
-        }
-        
-        return spike;
+        return FirePolicy::fire(threshold_, membrane_potential_);
     }
 
 public:
-    constexpr SpikingCompute::signal_t
+    constexpr SpikingCompute<FirePolicy>::signal_t
     operator()(const auto& incoming_signal)
     {
         leaky_integrate(incoming_signal);

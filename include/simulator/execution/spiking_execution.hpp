@@ -1,6 +1,7 @@
 #pragma once
 
 #include "simulator/compute_policy/spiking_compute.hpp"
+#include "simulator/compute_policy/fire_policy/default_fire.hpp"
 
 #include <algorithm>
 #include <cstddef>
@@ -9,11 +10,12 @@ namespace nevresim {
 
 template <
     int SimulationLength,
-    template<std::size_t InputSize> class SpikeProvider>
+    template<std::size_t InputSize> class SpikeProvider,
+    typename FirePolicy = DefaultFirePolicy>
 class SpikingExecution
 {
 public:
-    using compute_policy_t = SpikingCompute;
+    using compute_policy_t = SpikingCompute<FirePolicy>;
 
     constexpr static auto execute(
         const auto& input, 
