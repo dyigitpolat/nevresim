@@ -7,6 +7,8 @@
 #include "_tests/real_valued_multi_core.hpp"
 #include "_tests/xor_test/xor_test.hpp"
 
+#include "simulator/compute_policy/fire_policy/novena_fire.hpp"
+
 #include <iostream>
 
 namespace nevresim
@@ -25,8 +27,8 @@ void run_all()
     report_result("3 core 2x2", test_3_core_2x2);
     report_result("real valued single core", test_single_real_valued_core);
     report_result("real valued multi core", test_multi_real_valued_core);
-    report_result("xor test", test_xor);
-    report_result("xor test novena fire", test_xor_novena);
+    report_result("xor test", test_xor<>);
+    report_result("xor test novena fire", test_xor<NovenaFirePolicy>);
 }
 
 } // namespace nevresim::tests
