@@ -27,8 +27,8 @@ class NeuronCompute<Config, SpikingCompute<FirePolicy>>
     {
         membrane_potential_ += 
             std::inner_product(
-                std::begin(weights_), std::end(weights_),
-                std::begin(incoming_spikes), 
+                std::cbegin(weights_), std::cend(weights_),
+                std::cbegin(incoming_spikes), 
                 static_cast<MembranePotential<weight_t>>(0))
             + bias_ 
             - Config::leak_amount_;

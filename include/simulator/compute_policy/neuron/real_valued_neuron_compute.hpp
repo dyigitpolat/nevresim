@@ -29,8 +29,8 @@ public:
         return std::max(
             signal_t{0}, 
             std::inner_product(
-                std::begin(weights_), std::end(weights_),
-                std::begin(incoming_signal), 
+                std::cbegin(weights_), std::cend(weights_),
+                std::cbegin(incoming_signal), 
                 signal_t{0}
             ) + bias_);
     }
