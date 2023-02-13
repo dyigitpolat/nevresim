@@ -40,6 +40,7 @@ consteval auto generate_xor_chip_outputs()
 template <typename ComputePolicy>
 consteval auto generate_xor_chip()
 {
+    using weight_t = double;
     constexpr std::size_t axon_count{3};
     constexpr std::size_t neuron_count{3};
     constexpr std::size_t core_count{3};
@@ -48,6 +49,7 @@ consteval auto generate_xor_chip()
     constexpr MembraneLeak<weight_t> leak{0};
 
     using Cfg = ChipConfiguration<
+        weight_t,
         axon_count,
         neuron_count,
         core_count,

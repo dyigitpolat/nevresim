@@ -67,7 +67,7 @@ public:
 
     constexpr
     void load_weights(
-        const ChipWeights<config_>& weights)
+        const ChipWeights<config_, typename Config::weight_t>& weights)
     {
         for(auto core_iter = std::begin(weights.cores_); auto& core : cores_)
         {

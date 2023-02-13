@@ -14,6 +14,8 @@ struct NeuronCompute;
 template <typename Config>
 class NeuronCompute<Config, RealValuedCompute>
 {
+    using weight_t = Config::weight_t;
+
     using weights_array_t = std::array<Weight<weight_t>, Config::axon_count_>;
     using signal_t = typename RealValuedCompute::signal_t;
 
@@ -36,7 +38,8 @@ public:
     constexpr void reset() {}
 
     constexpr
-    void load_weights(const NeuronWeights<Config{}>& weights)
+    void load_weights(
+        const NeuronWeights<Config{}, typename Config::weight_t>& weights)
     {
         weights_ = weights.weights_;
         bias_ = weights.bias_;

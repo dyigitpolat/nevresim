@@ -38,6 +38,7 @@ consteval auto generate_outputs_single_core_2x2()
 
 constexpr bool test_single_core()
 {
+    using weight_t = double;
     constexpr std::size_t axon_count{2};
     constexpr std::size_t neuron_count{2};
     constexpr std::size_t core_count{1};
@@ -49,6 +50,7 @@ constexpr bool test_single_core()
     using Con = CoreConnection<axon_count>;
 
     auto chip = generate_test_chip<
+        weight_t,
         generate_connections_single_core_2x2<Con, Src, core_count>(),
         generate_outputs_single_core_2x2<Src, output_size>(),
         axon_count,
@@ -59,9 +61,9 @@ constexpr bool test_single_core()
         leak,
         SpikingCompute<>> ();
 
-    using ChipW = ChipWeights<chip.config_>;
-    using CoreW = CoreWeights<chip.config_>;
-    using NeurW = NeuronWeights<chip.config_>;
+    using ChipW = ChipWeights<chip.config_, weight_t>;
+    using CoreW = CoreWeights<chip.config_, weight_t>;
+    using NeurW = NeuronWeights<chip.config_, weight_t>;
     using Ws = std::array<Weight<weight_t>, axon_count>;
     
     ChipW weights{{
@@ -73,11 +75,11 @@ constexpr bool test_single_core()
 
     std::array<raw_input_t, 2> input{1.0, 1.0};
         
-    auto buffer = 
-        chip.execute<SpikingExecution<4, DeterministicSpikeGenerator>>(input);
+    auto buffer = chip.execute<
+        SpikingExecution<4, DeterministicSpikeGenerator, weight_t>>(input);
 
     chip.reset();
-    return buffer == std::array<Weight<weight_t>, 2>{4, 2};
+    return buffer == std::array<weight_t, 2>{4, 2};
 }
 
 } // namespace nevresim::tests

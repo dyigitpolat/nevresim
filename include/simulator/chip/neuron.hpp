@@ -27,8 +27,9 @@ public:
         compute_.reset();
     }
 
-    constexpr
-    void load_weights(const NeuronWeights<Config{}>& weights)
+    constexpr 
+    void load_weights(
+        const NeuronWeights<Config{}, typename Config::weight_t>& weights)
     {
         compute_.load_weights(weights);
     }

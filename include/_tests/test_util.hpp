@@ -23,6 +23,7 @@ constexpr nevresim::core_id_t in = nevresim::k_input_buffer_id;
 constexpr nevresim::core_id_t off = nevresim::k_no_connection;
 
 template <
+    typename WeightType,
     auto connections,
     auto outputs,
     std::size_t axon_count,
@@ -30,13 +31,14 @@ template <
     std::size_t core_count,
     std::size_t input_size,
     std::size_t output_size,
-    nevresim::MembraneLeak<weight_t> leak,
+    nevresim::MembraneLeak<WeightType> leak,
     typename ComputePolicy
 >
 consteval auto generate_test_chip()
 {
 
     using Cfg = nevresim::ChipConfiguration<
+        WeightType,
         axon_count,
         neuron_count,
         core_count,
@@ -99,10 +101,11 @@ constexpr bool is_almost_equal(
         (std::numeric_limits<FloatType>::epsilon() * 2);
 }
 
+template <typename WeightType>
 void load_weights(auto& chip, auto weights_filename)
 {
-    std::unique_ptr<WeightsLoader<chip.config_>>
-        weights_loader_ptr{new WeightsLoader<chip.config_>{}};
+    std::unique_ptr<WeightsLoader<chip.config_, WeightType>>
+        weights_loader_ptr{new WeightsLoader<chip.config_, WeightType>{}};
 
     std::ifstream weights_stream(weights_filename);
     if(weights_stream.is_open())

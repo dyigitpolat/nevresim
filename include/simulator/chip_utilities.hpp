@@ -8,12 +8,13 @@ namespace nevresim
 {
 
 template <
+    typename WeightType,
     std::size_t AxonCount,
     std::size_t NeuronCount,
     std::size_t CoreCount,
     std::size_t InputSize,
     std::size_t OutputSize,
-    MembraneLeak<weight_t> LeakAmount
+    MembraneLeak<WeightType> LeakAmount
     >
 struct ChipConfiguration
 {
@@ -23,7 +24,9 @@ struct ChipConfiguration
     static constexpr std::size_t input_size_{InputSize};
     static constexpr std::size_t output_size_{OutputSize};
 
-    static constexpr MembraneLeak<weight_t> leak_amount_{LeakAmount};
+    static constexpr MembraneLeak<WeightType> leak_amount_{LeakAmount};
+
+    using weight_t = WeightType;
 };
 
 struct SpikeSource

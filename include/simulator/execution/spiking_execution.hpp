@@ -11,6 +11,7 @@ namespace nevresim {
 template <
     int SimulationLength,
     template<std::size_t InputSize> class SpikeProvider,
+    typename WeightType,
     typename FirePolicy = DefaultFirePolicy>
 class SpikingExecution
 {
@@ -23,6 +24,8 @@ public:
         const auto& compute_function,
         const auto& output_buffer_read_function)
     {
+        using weight_t = WeightType;
+
         std::array<Weight<weight_t>, chip.config_.output_size_> buffer{};
         for(int i = 0; i < SimulationLength; ++i){
             const auto& spikes{

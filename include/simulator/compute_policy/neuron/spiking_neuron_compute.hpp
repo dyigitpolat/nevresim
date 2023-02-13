@@ -15,6 +15,7 @@ struct NeuronCompute;
 template <typename Config, typename FirePolicy>
 class NeuronCompute<Config, SpikingCompute<FirePolicy>>
 {
+    using weight_t = Config::weight_t;
     using weights_array_t = std::array<Weight<weight_t>, Config::axon_count_>;
 
     weights_array_t weights_{};
@@ -53,7 +54,8 @@ public:
     }
 
     constexpr
-    void load_weights(const NeuronWeights<Config{}>& weights)
+    void load_weights(
+        const NeuronWeights<Config{}, typename Config::weight_t>& weights)
     {
         threshold_ = weights.threshold_;
         weights_ = weights.weights_;

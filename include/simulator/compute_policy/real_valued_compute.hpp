@@ -7,7 +7,7 @@ namespace nevresim
 class RealValuedCompute
 {
 public: 
-    using signal_t = MembranePotential<weight_t>;
+    using signal_t = double;
 
     template <typename Chip>
     using concrete_policy_t = ComputePolicyBase<Chip, signal_t>;

@@ -59,7 +59,8 @@ public:
     }
 
     constexpr
-    void load_weights(const CoreWeights<Config{}>& weights)
+    void load_weights(
+        const CoreWeights<Config{}, typename Config::weight_t>& weights)
     {
         for(
             auto neuron_iter = std::begin(weights.neurons_); 
