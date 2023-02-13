@@ -112,6 +112,11 @@ void load_weights(auto& chip, auto weights_filename)
     {
         weights_stream >> *weights_loader_ptr;
     }
+    else
+    {
+        std::cerr << "Failed to open file: " << weights_filename << "\n";
+        exit(1);
+    }
 
     chip.load_weights(weights_loader_ptr->chip_weights_);
 }
@@ -129,6 +134,11 @@ auto load_input_n(auto input_filename_prefix, int input_id)
     if(input_stream.is_open())
     {
         input_stream >> *input_loader_ptr;
+    }
+    else
+    {
+        std::cerr << "Failed to open file: " << fname << "\n";
+        exit(1);
     }
 
     return std::pair{input_loader_ptr->input_, input_loader_ptr->target_};
