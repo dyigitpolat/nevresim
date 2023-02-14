@@ -17,13 +17,24 @@ file(GLOB SOURCES src/*.cpp)
 # add_subdirectory(lib/A_LIB_DIR)
 # add_subdirectory(lib/A_LIB_DIR)
 
+# add a switch for debug/release build
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build")
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+
 # enable all warnings and treat them as errors in a portable way
 if (MSVC)
     # warning level 4 and all warnings as errors
     add_compile_options(/W4 /WX)
 else ()
     # lots of warnings and all warnings as errors
-    add_compile_options(-Wall -Wextra -pedantic -Werror -O3)
+    # add different optimization flags for debug/release builds
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(-g -Wall -Wextra -pedantic -Werror -O0)
+        message("Debug mode -- nevresim")
+    elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_compile_options(-Wall -Wextra -pedantic -Werror -O3)
+        message("Release mode -- nevresim")
+    endif ()
 endif ()
 
 # compiles the files defined by SOURCES to generante the executable defined by PROJECT_NAME
