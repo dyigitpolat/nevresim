@@ -6,14 +6,13 @@ template <typename ExecutePolicy>
 class ChipExecutor
 {
 public:
+    template <typename ConcreteComputePolicy>
     constexpr static auto execute(
         const auto& input, 
-        auto& chip,
-        const auto& compute_function,
-        const auto& output_buffer_read_function)
+        auto& chip)
     {
-        return ExecutePolicy::execute(
-            input, chip, compute_function, output_buffer_read_function);
+        return ExecutePolicy::
+            template execute<ConcreteComputePolicy>(input, chip);
     }
 };
 

@@ -23,7 +23,8 @@ bool test_xor()
         generate_xor_chip<SpikingCompute<FirePolicy>>();
     
     using spiking_1000 = 
-        SpikingExecution<1000, StochasticSpikeGenerator, weight_t, FirePolicy>;
+        SpikingExecution<
+            1000, 2, StochasticSpikeGenerator, weight_t, FirePolicy>;
 
     load_weights<weight_t>(
         chip, "include/_tests/xor_test/xor_chip_weights.txt");

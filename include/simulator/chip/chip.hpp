@@ -50,12 +50,8 @@ public:
             std::is_same_v<
                 typename ExecutionPolicy::compute_policy_t, ComputePolicy>);
 
-        return ChipExecutor<ExecutionPolicy>::execute(
-            input, 
-            *this, 
-            concrete_policy_t::generate_compute(), 
-            concrete_policy_t::generate_read_output_buffer()
-        );
+        return ChipExecutor<ExecutionPolicy>::
+            template execute<concrete_policy_t>(input, *this);
     }
     
     constexpr

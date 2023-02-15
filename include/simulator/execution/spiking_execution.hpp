@@ -10,7 +10,8 @@ namespace nevresim {
 
 template <
     int SimulationLength,
-    template<std::size_t InputSize> class SpikeProvider,
+    std::size_t OutputSize,
+    template<auto... Args> class SpikeProvider,
     typename WeightType,
     typename FirePolicy = DefaultFirePolicy>
 class SpikingExecution
@@ -18,23 +19,22 @@ class SpikingExecution
 public:
     using compute_policy_t = SpikingCompute<FirePolicy>;
 
+    template <typename ConcreteComputePolicy, typename Chip>
     constexpr static auto execute(
         const auto& input, 
-        auto& chip,
-        const auto& compute_function,
-        const auto& output_buffer_read_function)
+        Chip& chip)
     {
         using weight_t = WeightType;
 
-        std::array<Weight<weight_t>, chip.config_.output_size_> buffer{};
+        std::array<Weight<weight_t>, OutputSize> buffer{};
         for(int i = 0; i < SimulationLength; ++i){
             const auto& spikes{
-                SpikeProvider<chip.config_.input_size_>
+                SpikeProvider<(Chip::config_).input_size_>
                     ::generate_spikes(input)};
 
-            compute_function(chip, spikes);
+            ConcreteComputePolicy::compute_chip(chip, spikes);
 
-            auto&& out = output_buffer_read_function(chip, spikes);
+            auto&& out{ConcreteComputePolicy::read_output_buffer(chip, spikes)};
             std::ranges::transform(
                 std::ranges::cbegin(out), std::ranges::cend(out),
                 std::ranges::cbegin(buffer), std::ranges::cend(buffer),
