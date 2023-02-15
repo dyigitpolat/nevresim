@@ -50,19 +50,19 @@ public:
     static constexpr
     void compute(Chip& chip, const auto& input_buffer)
     {
-            std::array<
-                std::array<SignalType, Chip::config_.axon_count_>, 
-                Chip::config_.core_count_> axons{};
+        std::array<
+            std::array<SignalType, Chip::config_.axon_count_>, 
+            Chip::config_.core_count_> axons{};
 
-            for(int core_id{}; auto& axon : axons)
-            {
-                axon = get_axon_input(chip, core_id++, input_buffer);
-            }
+        for(int core_id{}; auto& axon : axons)
+        {
+            axon = get_axon_input(chip, core_id++, input_buffer);
+        }
 
-            for(int core_id{}; auto& core : chip.get_cores())
-            {
-                core.compute(axons[core_id++]);
-            }
+        for(int core_id{}; auto& core : chip.get_cores())
+        {
+            core.compute(axons[core_id++]);
+        }
     }
 
     static constexpr
