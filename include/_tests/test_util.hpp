@@ -31,7 +31,7 @@ template <
     std::size_t core_count,
     std::size_t input_size,
     std::size_t output_size,
-    nevresim::MembraneLeak<WeightType> leak,
+    constant<MembraneLeak<WeightType>> leak,
     typename ComputePolicy
 >
 consteval auto generate_test_chip()
@@ -101,11 +101,11 @@ constexpr bool is_almost_equal(
         (std::numeric_limits<FloatType>::epsilon() * 2);
 }
 
-template <typename WeightType>
-void load_weights(auto& chip, auto weights_filename)
+template <typename WeightType, typename Chip>
+void load_weights(Chip& chip, auto weights_filename)
 {
-    std::unique_ptr<WeightsLoader<chip.config_, WeightType>>
-        weights_loader_ptr{new WeightsLoader<chip.config_, WeightType>{}};
+    std::unique_ptr<WeightsLoader<Chip::config_, WeightType>>
+        weights_loader_ptr{new WeightsLoader<Chip::config_, WeightType>{}};
 
     std::ifstream weights_stream(weights_filename);
     if(weights_stream.is_open())

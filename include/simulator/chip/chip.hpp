@@ -22,7 +22,8 @@ template<
     >
 class Chip
 {
-    using concrete_policy_t = typename ComputePolicy::concrete_policy_t<Chip>;
+    using concrete_policy_t = 
+        typename ComputePolicy::template concrete_policy_t<Chip>;
     using core_t = Core<Config, ComputePolicy>;
     using cores_array_t = 
         std::array<core_t, Config::core_count_>;
@@ -30,6 +31,7 @@ class Chip
     cores_array_t cores_{};
 
 public:
+    using config_t = Config;
     static constexpr Config config_ = Config{};
     static constexpr Mapping mapping_ = mapping;
 

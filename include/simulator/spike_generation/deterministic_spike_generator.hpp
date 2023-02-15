@@ -6,8 +6,7 @@
 #include <algorithm>
 
 namespace nevresim {
-
-template <std::size_t InputSize, raw_input_t Threshold = 0.5>
+template <std::size_t InputSize, constant<raw_input_t> Threshold = 0.5>
 class DeterministicSpikeGenerator
 {
 public:
@@ -24,7 +23,7 @@ public:
             [&](auto item)
             {
                 return static_cast<spike_t>(
-                    item > Threshold
+                    item > Threshold.value
                 );
             });
         

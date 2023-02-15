@@ -9,12 +9,12 @@
 namespace nevresim {
 
 template <typename Config, typename ComputePolicy>
-struct NeuronCompute;
+class NeuronCompute;
 
 template <typename Config>
 class NeuronCompute<Config, RealValuedCompute>
 {
-    using weight_t = Config::weight_t;
+    using weight_t = typename Config::weight_t;
 
     using weights_array_t = std::array<Weight<weight_t>, Config::axon_count_>;
     using signal_t = typename RealValuedCompute::signal_t;

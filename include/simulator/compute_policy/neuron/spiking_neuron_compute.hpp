@@ -10,12 +10,12 @@
 namespace nevresim {
 
 template <typename Config, typename ComputePolicy>
-struct NeuronCompute;
+class NeuronCompute;
 
 template <typename Config, typename FirePolicy>
 class NeuronCompute<Config, SpikingCompute<FirePolicy>>
 {
-    using weight_t = Config::weight_t;
+    using weight_t = typename Config::weight_t;
     using weights_array_t = std::array<Weight<weight_t>, Config::axon_count_>;
 
     weights_array_t weights_{};
@@ -40,7 +40,7 @@ class NeuronCompute<Config, SpikingCompute<FirePolicy>>
     }
 
 public:
-    constexpr SpikingCompute<FirePolicy>::signal_t
+    constexpr typename SpikingCompute<FirePolicy>::signal_t
     operator()(const auto& incoming_signal)
     {
         leaky_integrate(incoming_signal);

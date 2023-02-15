@@ -14,7 +14,7 @@ template <
     std::size_t CoreCount,
     std::size_t InputSize,
     std::size_t OutputSize,
-    MembraneLeak<WeightType> LeakAmount
+    constant<MembraneLeak<WeightType>> LeakAmount
     >
 struct ChipConfiguration
 {
@@ -24,7 +24,7 @@ struct ChipConfiguration
     static constexpr std::size_t input_size_{InputSize};
     static constexpr std::size_t output_size_{OutputSize};
 
-    static constexpr MembraneLeak<WeightType> leak_amount_{LeakAmount};
+    static constexpr MembraneLeak<WeightType> leak_amount_{LeakAmount.value};
 
     using weight_t = WeightType;
 };

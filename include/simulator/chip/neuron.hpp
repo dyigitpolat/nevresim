@@ -15,7 +15,7 @@ public:
     constexpr 
     Neuron() {}
 
-    constexpr ComputePolicy::signal_t 
+    constexpr typename ComputePolicy::signal_t 
     compute(const auto& incoming_signal)
     {
         return compute_(incoming_signal);

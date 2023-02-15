@@ -5,6 +5,13 @@
 
 namespace nevresim {
 
+template<typename T>
+struct constant
+{
+    T value;
+    consteval constant(T val) : value(val) {}
+};
+
 using raw_input_t = double;
 using spike_t = std::int_fast8_t;
 
