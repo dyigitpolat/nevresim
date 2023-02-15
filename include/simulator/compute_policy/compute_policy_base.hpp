@@ -48,7 +48,7 @@ private:
 
 public:
     static constexpr
-    void compute_chip(Chip& chip, const auto& input_buffer)
+    void compute(Chip& chip, const auto& input_buffer)
     {
             std::array<
                 std::array<SignalType, Chip::config_.axon_count_>, 

@@ -32,7 +32,7 @@ public:
                 SpikeProvider<(Chip::config_).input_size_>
                     ::generate_spikes(input)};
 
-            ConcreteComputePolicy::compute_chip(chip, spikes);
+            ConcreteComputePolicy::compute(chip, spikes);
 
             auto&& out{ConcreteComputePolicy::read_output_buffer(chip, spikes)};
             std::ranges::transform(

@@ -17,7 +17,7 @@ public:
         auto& chip)
     {
         for(std::size_t i = 0; i < chip.config_.core_count_; ++i){
-            ConcreteComputePolicy::compute_chip(chip, input);
+            ConcreteComputePolicy::compute(chip, input);
         }
 
         return ConcreteComputePolicy::read_output_buffer(chip, input);
