@@ -38,3 +38,4 @@ inputs/*
 # some clutter
 build/*
 .vscode/*
+.cache/*

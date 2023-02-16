@@ -73,7 +73,7 @@ int argmax(const auto& buffer)
         std::max_element(buffer.begin(), buffer.end()));
 }
 
-void report(
+inline void report(
     int guess, int target, int idx, int& correct, int& total)
 {
     std::cout 

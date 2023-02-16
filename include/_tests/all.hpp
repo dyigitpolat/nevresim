@@ -21,7 +21,7 @@ static_assert(test_3_core_2x2());
 static_assert(test_single_real_valued_core());
 static_assert(test_multi_real_valued_core());
 
-void run_all()
+inline void run_all()
 {
     report_result("single core", test_single_core);
     report_result("3 core 2x2", test_3_core_2x2);

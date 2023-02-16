@@ -2,6 +2,8 @@
 
 #include "simulator/chip_utilities.hpp"
 
+#include "common/constants.hpp"
+
 namespace nevresim 
 {
 
