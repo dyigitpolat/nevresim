@@ -56,6 +56,11 @@ public:
         {
             neuron.reset();
         }
+
+        for(auto& signal : output_)
+        {
+            signal = 0;
+        }
     }
 
     constexpr
