@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.5.1)
 project(nevresim)
 
 # set the C++ standard
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 20)
 
 # /include as directory
