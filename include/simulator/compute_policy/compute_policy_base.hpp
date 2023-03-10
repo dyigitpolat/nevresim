@@ -25,6 +25,10 @@ private:
         {
             return SignalType{};
         }
+        else if(source.core_ == k_always_on)
+        {
+            return SignalType{1};
+        }
 
         return 
             chip.get_cores()[source.core_]
