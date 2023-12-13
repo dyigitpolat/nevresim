@@ -54,7 +54,7 @@ private:
 
 public:
     static constexpr
-    void compute(Chip& chip, const auto& input_buffer)
+    void compute(Chip& chip, const auto& input_buffer, int cycle)
     {
         std::array<
             std::array<SignalType, Chip::config_.axon_count_>, 
@@ -67,7 +67,10 @@ public:
 
         for(int core_id{}; auto& core : chip.get_cores())
         {
-            core.compute(axons[core_id++]);
+            if(core.get_latency() <= cycle)
+            {
+                core.compute(axons[core_id++]);
+            }
         }
     }
 

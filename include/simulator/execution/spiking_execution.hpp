@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 
 namespace nevresim {
 
@@ -32,7 +33,7 @@ public:
                 SpikeProvider<(Chip::config_).input_size_>
                     ::generate_spikes(input)};
 
-            ConcreteComputePolicy::compute(chip, spikes);
+            ConcreteComputePolicy::compute(chip, spikes, i);
 
             auto&& out{ConcreteComputePolicy::read_output_buffer(chip, spikes)};
             std::ranges::transform(

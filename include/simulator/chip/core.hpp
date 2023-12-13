@@ -25,6 +25,7 @@ class Core
 
     neurons_array_t neurons_{};
     output_array_t output_{};
+    int latency_{};
 
 public:
     constexpr 
@@ -47,6 +48,11 @@ public:
                 return neuron.compute(incoming_signals); 
             }
         );
+    }
+
+    constexpr int get_latency() const
+    {
+        return latency_;
     }
 
     constexpr
