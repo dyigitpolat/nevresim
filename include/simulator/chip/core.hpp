@@ -32,7 +32,8 @@ public:
     Core() : neurons_{} {}
 
     constexpr 
-    Core(neurons_array_t neurons) : neurons_(neurons) {}
+    Core(neurons_array_t neurons, int latency = 0) : 
+        neurons_(neurons), latency_(latency) {}
 
     constexpr
     const output_array_t& get_output() const & 
