@@ -73,6 +73,7 @@ public:
     void load_weights(
         const CoreWeights<Config{}, typename Config::weight_t>& weights)
     {
+        latency_ = weights.latency_;
         for(
             auto neuron_iter = std::begin(weights.neurons_); 
             auto& neuron : neurons_)
