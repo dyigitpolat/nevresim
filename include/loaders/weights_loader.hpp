@@ -26,7 +26,6 @@ public:
         
         for(auto& core : loader.chip_weights_.cores_)
         {
-            weights_stream >> core.latency_;
             for(auto& neuron : core.neurons_)
             {
                 weights_stream >> neuron.threshold_;

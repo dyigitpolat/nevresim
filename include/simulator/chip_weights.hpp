@@ -26,7 +26,6 @@ public:
     std::array<
         NeuronWeights<Config, WeightType>, 
         Config.neuron_count_> neurons_;
-    int latency_{};
 };
 
 template <ChipConfiguration Config, typename WeightType>
