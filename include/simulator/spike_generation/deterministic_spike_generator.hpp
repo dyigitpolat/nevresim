@@ -4,6 +4,7 @@
 #include "common/types.hpp"
 
 #include <algorithm>
+#include <array>
 
 namespace nevresim {
 template <std::size_t InputSize, constant<raw_input_t> Threshold = 0.5>
