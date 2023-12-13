@@ -67,10 +67,12 @@ public:
 
         for(int core_id{}; auto& core : chip.get_cores())
         {
-            if(core.get_latency() <= cycle)
+            if(cycle >= core.get_latency())
             {
-                core.compute(axons[core_id++]);
+                core.compute(axons[core_id]);
             }
+
+            ++core_id;
         }
     }
 
