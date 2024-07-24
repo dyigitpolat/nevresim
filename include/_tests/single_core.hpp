@@ -76,7 +76,7 @@ constexpr bool test_single_core()
     std::array<raw_input_t, 2> input{1.0, 1.0};
         
     auto buffer = chip.execute<
-        SpikingExecution<4, 2, DeterministicSpikeGenerator, weight_t>>(input);
+        SpikingExecution<3, 1, 2, DeterministicSpikeGenerator, weight_t>>(input);
 
     chip.reset();
     return buffer == std::array<weight_t, 2>{4, 2};

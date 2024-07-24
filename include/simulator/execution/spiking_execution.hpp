@@ -11,6 +11,7 @@ namespace nevresim {
 
 template <
     int SimulationLength,
+    int Latency,
     std::size_t OutputSize,
     template<auto... Args> class SpikeProvider,
     typename WeightType,
@@ -28,10 +29,10 @@ public:
         using weight_t = WeightType;
 
         std::array<Weight<weight_t>, OutputSize> buffer{};
-        for(int i = 0; i < SimulationLength; ++i){
+        for(int i = 0; i < SimulationLength + Latency; ++i){
             const auto& spikes{
-                SpikeProvider<(Chip::config_).input_size_>
-                    ::generate_spikes(input)};
+                SpikeProvider<(Chip::config_).input_size_, SimulationLength>
+                    ::generate_spikes(input, i)};
 
             ConcreteComputePolicy::compute(chip, spikes, i);
 

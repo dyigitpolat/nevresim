@@ -7,7 +7,7 @@
 #include <array>
 
 namespace nevresim {
-template <std::size_t InputSize, constant<raw_input_t> Threshold = 0.5>
+template <std::size_t InputSize, int SimulationLength, constant<raw_input_t> Threshold = 0.5>
 class DeterministicSpikeGenerator
 {
 public:
@@ -15,8 +15,9 @@ public:
 
     constexpr
     static spike_source_t generate_spikes(
-        const auto& input)
+        const auto& input, int cycle)
     {
+        (void) cycle;
         spike_source_t source{};
         std::transform(
             std::cbegin(input), std::cend(input), 

@@ -2,34 +2,21 @@
 
 #include "common/constants.hpp"
 #include "common/types.hpp"
-#include "loaders/input_loader.hpp"
 
-#include <array>
 #include <algorithm>
-#include <random>
-#include <cstddef>
+#include <array>
+#include <cmath>
 
 namespace nevresim {
-
 template <std::size_t InputSize, int SimulationLength>
-class StochasticSpikeGenerator
+class FrontLoadedSpikeGenerator
 {
 public:
     using spike_source_t = std::array<spike_t, InputSize>;
 
-    static spike_source_t generate_spikes(
-        const auto& input, int cycle)
-    {
-        (void) cycle;
-        static std::random_device device;
-        static std::mt19937 engine(device());
-        
-        return generate_spikes(input, engine);
-    }
-
     constexpr
     static spike_source_t generate_spikes(
-        const auto& input, auto& random_engine)
+        const auto& input, int cycle)
     {
         spike_source_t source{};
         std::transform(
@@ -38,8 +25,7 @@ public:
             [&](auto item)
             {
                 return static_cast<spike_t>(
-                    std::discrete_distribution({1.0-item, item})
-                    (random_engine)
+                    std::llround(item * SimulationLength) > cycle
                 );
             });
         
