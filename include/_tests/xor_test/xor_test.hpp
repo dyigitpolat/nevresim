@@ -2,6 +2,7 @@
 
 #include "simulator/spike_generation/stochastic_spike_generator.hpp"
 #include "simulator/spike_generation/front_loaded_spike_generator.hpp"
+#include "simulator/spike_generation/uniform_spike_generator.hpp"
 #include "simulator/execution/spiking_execution.hpp"
 #include "simulator/compute_policy/spiking_compute.hpp"
 #include "simulator/compute_policy/real_valued_compute.hpp"
@@ -30,6 +31,10 @@ bool test_xor()
     using spiking_1000_s = 
         SpikingExecution<
             999, 1, 2, StochasticSpikeGenerator, weight_t, FirePolicy>;
+    
+    using spiking_1000_u = 
+        SpikingExecution<
+            999, 1, 2, UniformSpikeGenerator, weight_t, FirePolicy>;
 
     load_weights<weight_t>(
         chip, "include/_tests/xor_test/xor_chip_weights.txt");
@@ -40,7 +45,13 @@ bool test_xor()
     auto [correct_2, total_2] = test_on_inputs<spiking_1000_s>(
         chip,"include/_tests/xor_test/xor_inputs/xor_input_", 4);
 
-    return (correct == total) && (correct_2 == total_2);
+    auto [correct_3, total_3] = test_on_inputs<spiking_1000_u>(
+        chip,"include/_tests/xor_test/xor_inputs/xor_input_", 4);
+
+    return 
+        (correct == total) && 
+        (correct_2 == total_2) &&
+        (correct_3 == total_3);
 }
 
 } // namespace nevresim::tests
