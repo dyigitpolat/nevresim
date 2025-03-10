@@ -41,6 +41,10 @@ endif ()
 # compiles the files defined by SOURCES to generante the executable defined by PROJECT_NAME
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+# copy "include/_tests/xor_test/xor_chip_weights.txt" to "build/include/_tests/xor_test/xor_chip_weights.txt"
+file(COPY include/_tests/xor_test/xor_chip_weights.txt DESTINATION include/_tests/xor_test)
+file(COPY include/_tests/xor_test/xor_inputs/ DESTINATION include/_tests/xor_test/xor_inputs)
+
 # link libraries
 # target_link_libraries(${PROJECT_NAME} A_LIB)
 # target_link_libraries(${PROJECT_NAME} A_LIB)
