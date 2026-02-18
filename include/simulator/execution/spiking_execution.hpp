@@ -36,7 +36,7 @@ public:
 
             ConcreteComputePolicy::compute(chip, spikes, i);
 
-            auto&& out{ConcreteComputePolicy::read_output_buffer(chip, spikes)};
+            auto&& out{ConcreteComputePolicy::read_output_buffer(chip, spikes, i)};
             std::ranges::transform(
                 std::ranges::cbegin(out), std::ranges::cend(out),
                 std::ranges::cbegin(buffer), std::ranges::cend(buffer),

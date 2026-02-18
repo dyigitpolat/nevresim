@@ -6,6 +6,9 @@ namespace nevresim
     
 struct DefaultFirePolicy
 {
+    static constexpr bool always_on_every_cycle = true;
+    static constexpr bool latency_gated = true;
+
     static constexpr spike_t 
     fire(const auto& threshold, auto& membrane_potential)
     {
