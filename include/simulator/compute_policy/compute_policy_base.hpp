@@ -11,7 +11,8 @@ template <
     typename Chip, 
     typename SignalType, 
     bool AlwaysOnEveryCycle = true,
-    bool LatencyGated = true>
+    bool LatencyGated = true,
+    int LatencyScale = 1>
 class ComputePolicyBase
 {
 private:
@@ -83,7 +84,7 @@ public:
         {
             if constexpr (LatencyGated)
             {
-                if(cycle >= core.get_latency())
+                if(cycle >= core.get_latency() * LatencyScale)
                 {
                     core.compute(axons[core_id]);
                 }

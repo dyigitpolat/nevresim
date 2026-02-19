@@ -12,19 +12,17 @@ namespace nevresim {
 template <typename Config, typename ComputePolicy>
 class NeuronCompute;
 
-/// TTFS quantized neuron — true cycle-based Phase 1 + Phase 2 simulation.
+/// TTFS quantized neuron — **stateful** cycle-based Phase 1 + Phase 2.
 ///
-/// Implements the B1-model TTFS dynamics with discrete time steps:
+/// Called once per active cycle by ``Core::compute``.
 ///
-///   Phase 1:  V = Σ w_j · a_j + bias     (pre-activation)
-///   Phase 2:  for k = 0 … S-1:
-///                 if V >= θ  → return (S − k) / S    (fire-once)
-///                 V += θ / S                          (constant ramp)
-///             return 0                                (never fired)
+///   First call  (Phase 1):  V = Σ w_j · a_j + bias   (initial charge)
+///   Each  call  (Phase 2):  if V ≥ θ  → latch output (S − k) / S
+///                           V += θ / S                (constant ramp)
+///   After S calls:          return cached output
 ///
-/// This neuron is **stateless**: each invocation computes the full
-/// Phase 1 + Phase 2 pipeline from scratch, producing a quantised
-/// activation in {0, 1/S, 2/S, …, 1}.
+/// The neuron fires **at most once**; after that, the output is latched.
+/// ``reset()`` must be called between input samples.
 ///
 template <typename Config, int S>
 class NeuronCompute<Config, TTFSQuantizedCompute<S>>
@@ -37,35 +35,54 @@ class NeuronCompute<Config, TTFSQuantizedCompute<S>>
     Bias<weight_t> bias_{};
     Threshold<weight_t> threshold_{1};
 
+    // --- Per-sample state (cleared by reset()) ---
+    signal_t membrane_potential_{0};
+    signal_t output_{0};
+    bool initialized_{false};
+    bool has_fired_{false};
+    int steps_taken_{0};
+
 public:
     constexpr signal_t
     operator()(const auto& incoming_signal)
     {
-        // Phase 1: V = W · a + b
-        signal_t V = std::inner_product(
-            std::cbegin(weights_), std::cend(weights_),
-            std::cbegin(incoming_signal),
-            signal_t{0}
-        ) + bias_;
-
-        const signal_t theta = static_cast<signal_t>(threshold_);
-        const signal_t ramp  = theta / S;
-
-        // Phase 2: step through S discrete time steps
-        for (int k = 0; k < S; ++k)
+        // Phase 1: first active cycle — compute initial charge.
+        if (!initialized_)
         {
-            if (V >= theta)
-            {
-                return static_cast<signal_t>(S - k) / S;
-            }
-            V += ramp;
+            membrane_potential_ = std::inner_product(
+                std::cbegin(weights_), std::cend(weights_),
+                std::cbegin(incoming_signal),
+                signal_t{0}
+            ) + bias_;
+            initialized_ = true;
         }
 
-        // Neuron never fired within S steps
-        return signal_t{0};
+        // All S steps already done — return cached output.
+        if (steps_taken_ >= S) return output_;
+
+        const signal_t theta = static_cast<signal_t>(threshold_);
+
+        // Phase 2: fire-once check + constant ramp.
+        if (!has_fired_ && membrane_potential_ >= theta)
+        {
+            output_ = static_cast<signal_t>(S - steps_taken_) / S;
+            has_fired_ = true;
+        }
+
+        membrane_potential_ += theta / S;
+        ++steps_taken_;
+
+        return output_;
     }
 
-    constexpr void reset() {} // Stateless
+    constexpr void reset()
+    {
+        membrane_potential_ = 0;
+        output_ = 0;
+        initialized_ = false;
+        has_fired_ = false;
+        steps_taken_ = 0;
+    }
 
     constexpr
     void load_weights(
@@ -78,4 +95,3 @@ public:
 };
 
 } // namespace nevresim
-

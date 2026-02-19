@@ -8,17 +8,20 @@ namespace nevresim {
 
 /// Execution policy for TTFS quantized (cycle-based) mode.
 ///
-/// Structurally identical to ``TTFSContinuousExecution``: a single forward
-/// sweep through all cores, iterating ``core_count_`` times so that
-/// signals propagate through the entire network (each iteration
-/// propagates activations one hop further).
+/// Structurally mirrors ``SpikingExecution``: the **outer loop** iterates
+/// over ``(Latency + 1) * S`` discrete cycles.  On each cycle the compute
+/// policy processes every core whose latency-gated window includes that
+/// cycle (a core with hop-latency L is active during cycles
+/// ``[L*S, (L+1)*S)``).
 ///
-/// The only difference from the continuous path is the compute policy:
-/// ``TTFSQuantizedCompute<S>`` makes each neuron internally step through
-/// ``S`` discrete time steps (Phase 1 + Phase 2 of the B1-model),
-/// producing quantised activations in {0, 1/S, 2/S, …, 1}.
+/// Neurons are **stateful** — Phase 1 (initial charge) runs on the first
+/// active cycle and Phase 2 (fire-once check + constant ramp) advances
+/// one step per subsequent active cycle.
 ///
-template <int S>
+/// After all cycles complete the output buffer is read once (output
+/// neurons hold their final activation values).
+///
+template <int S, int Latency>
 class TTFSExecution
 {
 public:
@@ -29,8 +32,10 @@ public:
         const auto& input,
         auto& chip)
     {
-        for(std::size_t i = 0; i < chip.config_.core_count_; ++i){
-            ConcreteComputePolicy::compute(chip, input, i);
+        constexpr int total_cycles = (Latency + 1) * S;
+
+        for (int cycle = 0; cycle < total_cycles; ++cycle) {
+            ConcreteComputePolicy::compute(chip, input, cycle);
         }
 
         return ConcreteComputePolicy::read_output_buffer(chip, input);

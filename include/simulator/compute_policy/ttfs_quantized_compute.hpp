@@ -7,18 +7,14 @@ namespace nevresim
 
 /// Compute policy for TTFS quantized (cycle-based) mode.
 ///
-/// Each neuron internally simulates S discrete time steps per the
-/// B1-model TTFS dynamics:
+/// Each neuron simulates S discrete time steps per the B1-model TTFS
+/// dynamics.  The neuron is **stateful**: Phase 1 (initial charge) runs
+/// on the first active cycle, and Phase 2 (fire-once check + ramp)
+/// advances one step per subsequent cycle.
 ///
-///   Phase 1:  V = W · a + b   (charge from incoming activations)
-///   Phase 2:  for k = 0 … S-1:
-///                 if V >= θ  →  output (S − k) / S  (fire-once)
-///                 V += θ / S  (constant ramp)
-///
-/// From the chip's perspective the policy is identical to
-/// ``TTFSAnalyticalCompute``: real-valued signals, bias always active,
-/// no latency-gating (cores are processed in topological order via
-/// repeated sweeps).
+/// Latency gating is **enabled** with ``LatencyScale = S``, so a core
+/// with hop-latency L becomes active at cycle ``L * S``.  This matches
+/// the Python-side ``for cycle in range(total_cycles)`` outer loop.
 ///
 /// Template parameter ``S`` is the number of discrete time steps.
 ///
@@ -30,8 +26,8 @@ public:
     static constexpr int time_steps = S;
 
     template <typename Chip>
-    using concrete_policy_t = ComputePolicyBase<Chip, signal_t, true, false>;
+    using concrete_policy_t =
+        ComputePolicyBase<Chip, signal_t, true, true, S>;
 };
 
 } // namespace nevresim
-
