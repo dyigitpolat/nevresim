@@ -17,54 +17,77 @@ class ComputePolicyBase
 {
 private:
     static constexpr
-    SignalType retrieve_signal(
-        const Chip& chip, 
-        SpikeSource source, 
-        const auto& input_buffer,
-        [[maybe_unused]] int cycle = 0) 
-    {
-        if(source.core_ == k_input_buffer_id)
-        {
-            return input_buffer[source.neuron_];
-        }
-        else if(source.core_ == k_no_connection)
-        {
-            return SignalType{};
-        }
-        else if(source.core_ == k_always_on)
-        {
-            if constexpr (AlwaysOnEveryCycle)
-            {
-                return SignalType{1};
-            }
-            else
-            {
-                return cycle == 0 ? SignalType{1} : SignalType{};
-            }
-        }
-
-        return 
-            chip.get_cores()[source.core_]
-                .get_output()[source.neuron_];
-    }
-
-    static constexpr
     auto get_axon_input(
         const Chip& chip, 
         core_id_t core_id, 
         const auto& input_buffer,
-        int cycle = 0)
+        [[maybe_unused]] int cycle = 0)
     {
         std::array<SignalType, Chip::config_.axon_count_> signals{};
-        for(std::size_t axon_idx{}; axon_idx < Chip::config_.axon_count_; ++axon_idx)
+        std::size_t dest = 0;
+
+        const auto& conn = Chip::mapping_.core_sources_[core_id];
+        for (std::size_t s = 0; s < conn.span_count_; ++s)
         {
-            signals[axon_idx] = retrieve_signal(
-                chip, 
-                Chip::mapping_.core_sources_[core_id].sources_[axon_idx], 
-                input_buffer,
-                cycle);
+            const auto& span = conn.spans_[s];
+
+            if (span.core_ == k_no_connection)
+            {
+                dest += span.count_;
+            }
+            else if (span.core_ == k_input_buffer_id)
+            {
+                for (std::size_t i = 0; i < span.count_; ++i)
+                    signals[dest++] = input_buffer[span.start_ + i];
+            }
+            else if (span.core_ == k_always_on)
+            {
+                if constexpr (AlwaysOnEveryCycle)
+                {
+                    for (std::size_t i = 0; i < span.count_; ++i)
+                        signals[dest++] = SignalType{1};
+                }
+                else
+                {
+                    if (cycle == 0)
+                        for (std::size_t i = 0; i < span.count_; ++i)
+                            signals[dest++] = SignalType{1};
+                    else
+                        dest += span.count_;
+                }
+            }
+            else
+            {
+                const auto& output =
+                    chip.get_cores()[span.core_].get_output();
+                for (std::size_t i = 0; i < span.count_; ++i)
+                    signals[dest++] = output[span.start_ + i];
+            }
         }
+
         return signals;
+    }
+
+    static constexpr
+    SignalType retrieve_signal(
+        const Chip& chip,
+        SpikeSource source,
+        const auto& input_buffer,
+        [[maybe_unused]] int cycle = 0)
+    {
+        if (source.core_ == k_input_buffer_id)
+            return input_buffer[source.neuron_];
+        else if (source.core_ == k_no_connection)
+            return SignalType{};
+        else if (source.core_ == k_always_on)
+        {
+            if constexpr (AlwaysOnEveryCycle)
+                return SignalType{1};
+            else
+                return cycle == 0 ? SignalType{1} : SignalType{};
+        }
+        return chip.get_cores()[source.core_]
+                   .get_output()[source.neuron_];
     }
 
 public:
@@ -91,7 +114,6 @@ public:
             }
             else
             {
-                // TTFS latch: all cores active at every cycle.
                 core.compute(axons[core_id]);
             }
 

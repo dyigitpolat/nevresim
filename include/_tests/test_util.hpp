@@ -21,6 +21,7 @@ namespace tests
 
 constexpr nevresim::core_id_t in = nevresim::k_input_buffer_id;
 constexpr nevresim::core_id_t off = nevresim::k_no_connection;
+constexpr nevresim::core_id_t on = nevresim::k_always_on;
 
 template <
     typename WeightType,
@@ -31,6 +32,7 @@ template <
     std::size_t core_count,
     std::size_t input_size,
     std::size_t output_size,
+    std::size_t max_spans_per_core,
     constant<MembraneLeak<WeightType>> leak,
     typename ComputePolicy
 >
@@ -44,6 +46,7 @@ consteval auto generate_test_chip()
         core_count,
         input_size,
         output_size,
+        max_spans_per_core,
         leak
     >;
 

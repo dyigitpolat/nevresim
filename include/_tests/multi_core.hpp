@@ -15,19 +15,26 @@
 namespace nevresim {
 namespace tests {
 
-template <typename Con, typename Src, size_t core_count>
+// Core 0: input[0], input[1]         -> 1 span
+// Core 1: core0.neuron[1], off       -> 2 spans
+// Core 2: off, core0.neuron[0]       -> 2 spans
+// max_spans = 2
+template <typename Con, typename Span, size_t core_count,
+          size_t in_id, size_t off_id>
 consteval auto generate_connections_3_cores_2x2()
 {
-    std::array<Con, core_count> cons; 
+    std::array<Con, core_count> cons;
 
-    cons[0].sources_[0] = Src{in,0};
-    cons[0].sources_[1] = Src{in,1};
+    cons[0].spans_[0] = Span{in_id, 0, 2};
+    cons[0].span_count_ = 1;
 
-    cons[1].sources_[0] = Src{0,1};
-    cons[1].sources_[1] = Src{off,0};
+    cons[1].spans_[0] = Span{0, 1, 1};
+    cons[1].spans_[1] = Span{off_id, 0, 1};
+    cons[1].span_count_ = 2;
 
-    cons[2].sources_[0] = Src{off,0};
-    cons[2].sources_[1] = Src{0,0};
+    cons[2].spans_[0] = Span{off_id, 0, 1};
+    cons[2].spans_[1] = Span{0, 0, 1};
+    cons[2].span_count_ = 2;
 
     return cons;
 }
@@ -53,20 +60,23 @@ constexpr bool test_3_core_2x2()
     constexpr std::size_t core_count{3};
     constexpr std::size_t input_size{2};
     constexpr std::size_t output_size{4};
+    constexpr std::size_t max_spans{2};
     constexpr MembraneLeak<weight_t> leak{1};
 
     using Src = SpikeSource;
-    using Con = CoreConnection<axon_count>;
+    using Span = SourceSpan;
+    using Con = CoreSpanConnection<max_spans>;
 
     auto chip = generate_test_chip<
         weight_t,
-        generate_connections_3_cores_2x2<Con, Src, core_count>(),
+        generate_connections_3_cores_2x2<Con, Span, core_count, in, off>(),
         generate_outputs_3_cores_2x2<Src, output_size>(),
         axon_count,
         neuron_count,
         core_count,
         input_size,
         output_size,
+        max_spans,
         leak,
         SpikingCompute<>> ();
 

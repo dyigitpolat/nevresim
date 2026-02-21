@@ -14,13 +14,13 @@
 namespace nevresim {
 namespace tests {
 
-template <typename Con, typename Src, size_t core_count>
+template <typename Con, typename Span, size_t core_count, size_t in_id>
 consteval auto generate_connections_single_core_2x2()
 {
-    std::array<Con, core_count> cons; 
+    std::array<Con, core_count> cons;
 
-    cons[0].sources_[0] = Src{in,0};
-    cons[0].sources_[1] = Src{in,1};
+    cons[0].spans_[0] = Span{in_id, 0, 2};
+    cons[0].span_count_ = 1;
 
     return cons;
 }
@@ -44,20 +44,23 @@ constexpr bool test_single_core()
     constexpr std::size_t core_count{1};
     constexpr std::size_t input_size{2};
     constexpr std::size_t output_size{2};
+    constexpr std::size_t max_spans{1};
     constexpr MembraneLeak<weight_t> leak{0};
 
     using Src = SpikeSource;
-    using Con = CoreConnection<axon_count>;
+    using Span = SourceSpan;
+    using Con = CoreSpanConnection<max_spans>;
 
     auto chip = generate_test_chip<
         weight_t,
-        generate_connections_single_core_2x2<Con, Src, core_count>(),
+        generate_connections_single_core_2x2<Con, Span, core_count, in>(),
         generate_outputs_single_core_2x2<Src, output_size>(),
         axon_count,
         neuron_count,
         core_count,
         input_size,
         output_size,
+        max_spans,
         leak,
         SpikingCompute<>> ();
 

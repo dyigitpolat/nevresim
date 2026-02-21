@@ -8,20 +8,25 @@
 namespace nevresim::tests
 {
 
-template <typename Con, typename Src, size_t core_count, size_t in, size_t off>
+// Core 0: input[0..1], off            -> 2 spans
+// Core 1: core0[0..2]                 -> 1 span
+// Core 2: core1[0..2]                 -> 1 span
+// max_spans = 2
+template <typename Con, typename Span, size_t core_count,
+          size_t in_id, size_t off_id>
 consteval auto generate_xor_chip_connections()
 {
     std::array<Con, core_count> cons; 
         
-    cons[0].sources_[0] = Src{in,0};
-    cons[0].sources_[1] = Src{in,1};
-    cons[0].sources_[2] = Src{off,0};
-    cons[1].sources_[0] = Src{0,0};
-    cons[1].sources_[1] = Src{0,1};
-    cons[1].sources_[2] = Src{0,2};
-    cons[2].sources_[0] = Src{1,0};
-    cons[2].sources_[1] = Src{1,1};
-    cons[2].sources_[2] = Src{1,2};
+    cons[0].spans_[0] = Span{in_id, 0, 2};
+    cons[0].spans_[1] = Span{off_id, 0, 1};
+    cons[0].span_count_ = 2;
+
+    cons[1].spans_[0] = Span{0, 0, 3};
+    cons[1].span_count_ = 1;
+
+    cons[2].spans_[0] = Span{1, 0, 3};
+    cons[2].span_count_ = 1;
 
     return cons;
 }
@@ -46,6 +51,7 @@ consteval auto generate_xor_chip()
     constexpr std::size_t core_count{3};
     constexpr std::size_t input_size{2};
     constexpr std::size_t output_size{2};
+    constexpr std::size_t max_spans{2};
     constexpr MembraneLeak<weight_t> leak{0};
 
     using Cfg = ChipConfiguration<
@@ -55,12 +61,14 @@ consteval auto generate_xor_chip()
         core_count,
         input_size,
         output_size,
+        max_spans,
         leak
     >;
 
     using Map = Mapping<Cfg>;
     using Src = SpikeSource;
-    using Con = CoreConnection<axon_count>;
+    using Span = SourceSpan;
+    using Con = CoreSpanConnection<max_spans>;
 
     constexpr core_id_t in = k_input_buffer_id;
     constexpr core_id_t off = k_no_connection;
@@ -68,7 +76,7 @@ consteval auto generate_xor_chip()
     using Chip = Chip<
         Cfg, 
         Map{
-            generate_xor_chip_connections<Con, Src, core_count, in, off>(),
+            generate_xor_chip_connections<Con, Span, core_count, in, off>(),
             generate_xor_chip_outputs<Src, output_size>()}, 
         ComputePolicy>;
 
