@@ -16,11 +16,12 @@ template <typename Config, typename FirePolicy>
 class NeuronCompute<Config, SpikingCompute<FirePolicy>>
 {
     using weight_t = typename Config::weight_t;
+    using threshold_t = typename Config::threshold_t;
     using weights_array_t = std::array<Weight<weight_t>, Config::axon_count_>;
 
     weights_array_t weights_{};
     Bias<weight_t> bias_{};
-    Threshold<weight_t> threshold_{};
+    threshold_t threshold_{};
     MembranePotential<weight_t> membrane_potential_{};
 
     constexpr void leaky_integrate(const auto& incoming_spikes)
@@ -55,7 +56,7 @@ public:
 
     constexpr
     void load_weights(
-        const NeuronWeights<Config{}, typename Config::weight_t>& weights)
+        const NeuronWeights<Config{}, typename Config::weight_t, typename Config::threshold_t>& weights)
     {
         threshold_ = weights.threshold_;
         weights_ = weights.weights_;

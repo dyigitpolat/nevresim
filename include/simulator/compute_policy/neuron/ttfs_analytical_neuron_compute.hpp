@@ -22,13 +22,14 @@ template <typename Config>
 class NeuronCompute<Config, TTFSAnalyticalCompute>
 {
     using weight_t = typename Config::weight_t;
+    using threshold_t = typename Config::threshold_t;
 
     using weights_array_t = std::array<Weight<weight_t>, Config::axon_count_>;
     using signal_t = typename TTFSAnalyticalCompute::signal_t;
 
     weights_array_t weights_{};
     Bias<weight_t> bias_{};
-    Threshold<weight_t> threshold_{1};
+    threshold_t threshold_{1};
 
 public:
     constexpr TTFSAnalyticalCompute::signal_t
@@ -51,7 +52,7 @@ public:
 
     constexpr
     void load_weights(
-        const NeuronWeights<Config{}, typename Config::weight_t>& weights)
+        const NeuronWeights<Config{}, typename Config::weight_t, typename Config::threshold_t>& weights)
     {
         weights_ = weights.weights_;
         bias_ = weights.bias_;

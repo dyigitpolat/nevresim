@@ -69,9 +69,9 @@ constexpr bool test_multi_real_valued_core()
         leak,
         RealValuedCompute> ();
 
-    using ChipW = ChipWeights<chip.config_, weight_t>;
-    using CoreW = CoreWeights<chip.config_, weight_t>;
-    using NeurW = NeuronWeights<chip.config_, weight_t>;
+    using ChipW = ChipWeights<chip.config_, weight_t, weight_t>;
+    using CoreW = CoreWeights<chip.config_, weight_t, weight_t>;
+    using NeurW = NeuronWeights<chip.config_, weight_t, weight_t>;
     using Ws = std::array<Weight<weight_t>, axon_count>;
     
     ChipW weights{{

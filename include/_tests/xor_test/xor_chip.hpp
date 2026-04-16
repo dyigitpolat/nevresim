@@ -56,6 +56,7 @@ consteval auto generate_xor_chip()
 
     using Cfg = ChipConfiguration<
         weight_t,
+        weight_t,
         axon_count,
         neuron_count,
         core_count,

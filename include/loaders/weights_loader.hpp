@@ -9,12 +9,12 @@
 
 namespace nevresim {
 
-template <ChipConfiguration Config, typename WeightType>
+template <ChipConfiguration Config, typename WeightType, typename ThresholdType>
 class WeightsLoader
 {
 public:
-    using chip_weights_t = 
-        ChipWeights<Config, WeightType>;
+    using chip_weights_t =
+        ChipWeights<Config, WeightType, ThresholdType>;
 
 public:
     chip_weights_t chip_weights_;

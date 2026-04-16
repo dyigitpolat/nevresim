@@ -71,11 +71,11 @@ public:
 
     constexpr
     void load_weights(
-        const CoreWeights<Config{}, typename Config::weight_t>& weights)
+        const CoreWeights<Config{}, typename Config::weight_t, typename Config::threshold_t>& weights)
     {
         latency_ = weights.latency_;
         for(
-            auto neuron_iter = std::begin(weights.neurons_); 
+            auto neuron_iter = std::begin(weights.neurons_);
             auto& neuron : neurons_)
         {
             neuron.load_weights(*neuron_iter++);

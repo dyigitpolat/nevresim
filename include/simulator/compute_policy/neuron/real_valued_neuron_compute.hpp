@@ -39,7 +39,7 @@ public:
 
     constexpr
     void load_weights(
-        const NeuronWeights<Config{}, typename Config::weight_t>& weights)
+        const NeuronWeights<Config{}, typename Config::weight_t, typename Config::threshold_t>& weights)
     {
         weights_ = weights.weights_;
         bias_ = weights.bias_;

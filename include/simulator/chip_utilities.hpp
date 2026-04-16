@@ -28,6 +28,7 @@ struct CoreSpanConnection {
 
 template <
     typename WeightType,
+    typename ThresholdType,
     std::size_t AxonCount,
     std::size_t NeuronCount,
     std::size_t CoreCount,
@@ -48,6 +49,7 @@ struct ChipConfiguration
     static constexpr MembraneLeak<WeightType> leak_amount_{LeakAmount.value};
 
     using weight_t = WeightType;
+    using threshold_t = ThresholdType;
 };
 
 template<typename Config>

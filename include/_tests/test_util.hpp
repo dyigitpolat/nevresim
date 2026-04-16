@@ -41,6 +41,7 @@ consteval auto generate_test_chip()
 
     using Cfg = nevresim::ChipConfiguration<
         WeightType,
+        WeightType,
         axon_count,
         neuron_count,
         core_count,
@@ -104,11 +105,11 @@ constexpr bool is_almost_equal(
         (std::numeric_limits<FloatType>::epsilon() * 2);
 }
 
-template <typename WeightType, typename Chip>
+template <typename WeightType, typename ThresholdType, typename Chip>
 void load_weights(Chip& chip, auto weights_filename)
 {
-    std::unique_ptr<WeightsLoader<Chip::config_, WeightType>>
-        weights_loader_ptr{new WeightsLoader<Chip::config_, WeightType>{}};
+    std::unique_ptr<WeightsLoader<Chip::config_, WeightType, ThresholdType>>
+        weights_loader_ptr{new WeightsLoader<Chip::config_, WeightType, ThresholdType>{}};
 
     std::ifstream weights_stream(weights_filename);
     if(weights_stream.is_open())

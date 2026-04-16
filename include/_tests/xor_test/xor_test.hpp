@@ -36,7 +36,7 @@ bool test_xor()
         SpikingExecution<
             999, 1, 2, UniformSpikeGenerator, weight_t, FirePolicy>;
 
-    load_weights<weight_t>(
+    load_weights<weight_t, weight_t>(
         chip, "include/_tests/xor_test/xor_chip_weights.txt");
 
     auto [correct, total] = test_on_inputs<spiking_1000_fl>(

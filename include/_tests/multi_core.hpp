@@ -80,9 +80,9 @@ constexpr bool test_3_core_2x2()
         leak,
         SpikingCompute<>> ();
 
-    using ChipW = ChipWeights<chip.config_, weight_t>;
-    using CoreW = CoreWeights<chip.config_, weight_t>;
-    using NeurW = NeuronWeights<chip.config_, weight_t>;
+    using ChipW = ChipWeights<chip.config_, weight_t, weight_t>;
+    using CoreW = CoreWeights<chip.config_, weight_t, weight_t>;
+    using NeurW = NeuronWeights<chip.config_, weight_t, weight_t>;
     using Ws = std::array<Weight<weight_t>, axon_count>;
     
     ChipW weights{{
