@@ -6,6 +6,7 @@
 #include "_tests/real_valued_single_core.hpp"
 #include "_tests/real_valued_multi_core.hpp"
 #include "_tests/xor_test/xor_test.hpp"
+#include "_tests/spike_train_generator.hpp"
 
 #include "simulator/compute_policy/fire_policy/novena_fire.hpp"
 
@@ -16,6 +17,7 @@ namespace nevresim
 namespace tests
 {
 
+static_assert(test_spike_train_generator_replays_flat_train());
 static_assert(test_single_core());
 static_assert(test_3_core_2x2());
 static_assert(test_single_real_valued_core());

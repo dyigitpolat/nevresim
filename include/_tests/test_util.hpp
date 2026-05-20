@@ -2,6 +2,7 @@
 
 #include "simulator/chip/chip.hpp"
 #include "loaders/input_loader.hpp"
+#include "loaders/spike_train_input_loader.hpp"
 #include "loaders/weights_loader.hpp"
 #include "common/types.hpp"
 #include "common/constants.hpp"
@@ -146,6 +147,27 @@ auto load_input_n(auto input_filename_prefix, int input_id)
     }
 
     return std::pair{input_loader_ptr->input_, input_loader_ptr->target_};
+}
+
+auto load_spike_train_input_n(auto input_filename_prefix, int input_id)
+{
+    std::unique_ptr<SpikeTrainInputLoader> input_loader_ptr{
+        new SpikeTrainInputLoader{}};
+
+    std::string fname =
+        std::string{input_filename_prefix} +
+        std::to_string(input_id) +
+        std::string{".txt"};
+
+    std::ifstream input_stream(fname);
+    if (input_stream.is_open()) {
+        input_stream >> *input_loader_ptr;
+    } else {
+        std::cerr << "Failed to open file: " << fname << "\n";
+        exit(1);
+    }
+
+    return std::pair{input_loader_ptr->spikes_, input_loader_ptr->target_};
 }
 
 void print_details(
