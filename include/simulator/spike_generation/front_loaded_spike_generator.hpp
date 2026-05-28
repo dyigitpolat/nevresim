@@ -2,10 +2,11 @@
 
 #include "common/constants.hpp"
 #include "common/types.hpp"
+#include "simulator/spike_generation/spike_io_views.hpp"
 
-#include <algorithm>
 #include <array>
 #include <cmath>
+#include <ranges>
 
 namespace nevresim {
 template <std::size_t InputSize, int SimulationLength>
@@ -23,16 +24,17 @@ public:
         {
             return source;
         }
-        std::transform(
-            std::cbegin(input), std::cend(input), 
-            std::begin(source), 
+
+        const auto in = spike_io::strict_input<InputSize>(input);
+        auto out = spike_io::output(source);
+        std::ranges::transform(
+            in, out.begin(),
             [&](auto item)
             {
                 return static_cast<spike_t>(
-                    std::llround(item * SimulationLength) > cycle
-                );
+                    std::llround(item * SimulationLength) > cycle);
             });
-        
+
         return source;
     }
 };

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "common/types.hpp"
+#include "simulator/spike_generation/spike_io_views.hpp"
 
-#include <algorithm>
 #include <array>
 #include <cmath>
+#include <ranges>
 
 namespace nevresim {
 
@@ -34,12 +35,12 @@ public:
         const auto& input, int cycle)
     {
         spike_source_t source{};
-        std::transform(
-            std::cbegin(input), std::cend(input),
-            std::begin(source),
+        const auto in = spike_io::strict_input<InputSize>(input);
+        auto out = spike_io::output(source);
+        std::ranges::transform(
+            in, out.begin(),
             [cycle](auto item)
             {
-                // Clamp item to [0, 1]
                 auto clamped = item;
                 if (clamped < 0) clamped = 0;
                 if (clamped > 1) clamped = 1;
@@ -47,8 +48,6 @@ public:
                 int spike_time = static_cast<int>(
                     std::llround(SimulationLength * (1.0 - clamped)));
 
-                // Latched: once fired (cycle >= spike_time), stays high.
-                // spike_time == SimulationLength means activation ≈ 0 → never fires.
                 return static_cast<spike_t>(
                     spike_time < SimulationLength && cycle >= spike_time);
             });
@@ -58,4 +57,3 @@ public:
 };
 
 } // namespace nevresim
-

@@ -26,7 +26,7 @@ private:
         std::array<SignalType, Chip::config_.axon_count_> signals{};
         std::size_t dest = 0;
 
-        const auto& conn = Chip::mapping_.core_sources_[core_id];
+        const auto& conn = chip.get_mapping().core_sources_[core_id];
         for (std::size_t s = 0; s < conn.span_count_; ++s)
         {
             const auto& span = conn.spans_[s];
@@ -130,7 +130,7 @@ public:
         {
             output[output_idx] = retrieve_signal(
                 chip, 
-                Chip::mapping_.output_sources_[output_idx], 
+                chip.get_mapping().output_sources_[output_idx], 
                 input_buffer,
                 cycle);
         }

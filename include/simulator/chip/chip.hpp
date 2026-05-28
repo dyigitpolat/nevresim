@@ -36,6 +36,8 @@ public:
     static constexpr Mapping mapping_ = mapping;
 
 public:
+    constexpr const Mapping<Config>& get_mapping() const { return mapping_; }
+
     constexpr 
     Chip(cores_array_t cores) : cores_(cores) {}
 
