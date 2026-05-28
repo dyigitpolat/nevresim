@@ -1,26 +1,12 @@
 #pragma once
-#include "common/types.hpp"
+
+#include "simulator/compute_policy/compare_policy/strict_compare.hpp"
+#include "simulator/compute_policy/fire_policy/lif_fire_policy.hpp"
+#include "simulator/compute_policy/reset_policy/subtractive_reset.hpp"
 
 namespace nevresim
 {
-    
-struct DefaultFirePolicy
-{
-    static constexpr bool always_on_every_cycle = true;
-    static constexpr bool latency_gated = true;
 
-    static constexpr spike_t 
-    fire(const auto& threshold, auto& membrane_potential)
-    {
-        spike_t spike = threshold < membrane_potential;
-
-        if(spike)
-        {
-            membrane_potential -= threshold;
-        }
-        
-        return spike;
-    }
-};
+using DefaultFirePolicy = LIFirePolicy<SubtractiveReset, StrictCompare>;
 
 } // namespace nevresim

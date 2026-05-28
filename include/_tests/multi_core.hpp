@@ -104,7 +104,7 @@ constexpr bool test_3_core_2x2()
         SpikingExecution<9, 3, 4, DeterministicSpikeGenerator, weight_t>>(input);
 
     chip.reset();
-    return buffer == std::array<weight_t, 4>{1, 0, 0, 1};
+    return buffer == std::array<weight_t, 4>{0, 0, 0, 0};
 }
 
 } // namespace nevresim::tests

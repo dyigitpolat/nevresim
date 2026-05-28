@@ -19,6 +19,10 @@ public:
         const auto& input, int cycle)
     {
         spike_source_t source{};
+        if (cycle >= SimulationLength)
+        {
+            return source;
+        }
         std::transform(
             std::cbegin(input), std::cend(input), 
             std::begin(source), 

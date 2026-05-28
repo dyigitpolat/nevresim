@@ -27,8 +27,8 @@ public:
                 int N = std::llround(item * SimulationLength);
                 
                 if (N == 0) return static_cast<spike_t>(0);
-                if (N == SimulationLength) return static_cast<spike_t>(1);
                 if (cycle >= SimulationLength) return static_cast<spike_t>(0);
+                if (N == SimulationLength) return static_cast<spike_t>(1);
                 
                 double spacing = static_cast<double>(SimulationLength) / N;
                 return static_cast<spike_t>(

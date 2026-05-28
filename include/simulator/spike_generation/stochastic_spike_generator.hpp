@@ -20,10 +20,14 @@ public:
     static spike_source_t generate_spikes(
         const auto& input, int cycle)
     {
-        (void) cycle;
+        spike_source_t source{};
+        if (cycle >= SimulationLength)
+        {
+            return source;
+        }
         static std::random_device device;
         static std::mt19937 engine(device());
-        
+
         return generate_spikes(input, engine);
     }
 

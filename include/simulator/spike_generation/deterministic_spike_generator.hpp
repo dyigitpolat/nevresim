@@ -17,8 +17,11 @@ public:
     static spike_source_t generate_spikes(
         const auto& input, int cycle)
     {
-        (void) cycle;
         spike_source_t source{};
+        if (cycle >= SimulationLength)
+        {
+            return source;
+        }
         std::transform(
             std::cbegin(input), std::cend(input), 
             std::begin(source), 

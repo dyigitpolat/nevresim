@@ -82,7 +82,7 @@ constexpr bool test_single_core()
         SpikingExecution<3, 1, 2, DeterministicSpikeGenerator, weight_t>>(input);
 
     chip.reset();
-    return buffer == std::array<weight_t, 2>{4, 2};
+    return buffer == std::array<weight_t, 2>{4, 1};
 }
 
 } // namespace nevresim::tests
