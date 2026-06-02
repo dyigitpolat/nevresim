@@ -24,13 +24,13 @@ class NeuronCompute;
 /// The neuron fires **at most once**; after that, the output is latched.
 /// ``reset()`` must be called between input samples.
 ///
-template <typename Config, int S>
-class NeuronCompute<Config, TTFSQuantizedCompute<S>>
+template <typename Config, int S, typename ComparePolicy>
+class NeuronCompute<Config, TTFSQuantizedCompute<S, ComparePolicy>>
 {
     using weight_t = typename Config::weight_t;
     using threshold_t = typename Config::threshold_t;
     using weights_array_t = std::array<Weight<weight_t>, Config::axon_count_>;
-    using signal_t = typename TTFSQuantizedCompute<S>::signal_t;
+    using signal_t = typename TTFSQuantizedCompute<S, ComparePolicy>::signal_t;
 
     weights_array_t weights_{};
     Bias<weight_t> bias_{};
@@ -63,8 +63,8 @@ public:
 
         const signal_t theta = static_cast<signal_t>(threshold_);
 
-        // Phase 2: fire-once check + constant ramp.
-        if (!has_fired_ && membrane_potential_ >= theta)
+        // Phase 2: fire-once check (config-driven comparator) + constant ramp.
+        if (!has_fired_ && ComparePolicy::fires(theta, membrane_potential_))
         {
             output_ = static_cast<signal_t>(S - steps_taken_) / S;
             has_fired_ = true;

@@ -9,20 +9,18 @@
 
 namespace nevresim {
 
-/// TTFS (Time-To-First-Spike) spike generator — latched mode.
+/// TTFS (Time-To-First-Spike) spike generator — genuine single-spike.
 ///
-/// Each input fires once and **stays high** for all subsequent cycles,
-/// consistent with the TTFS latch semantics used in core outputs.
+/// Each input fires **exactly once**, at its time-coded cycle; the information
+/// is in the timing, not in a held value (a real TTFS axon does not re-send the
+/// spike every cycle). The downstream neuron reconstructs the ramp
+/// (``Σ w_j·(t−t_j)``) from this single arrival via its ``ramp_current``.
 ///
 ///     spike_time = round(SimulationLength * (1 - value))
 ///
-/// - value = 1.0  →  latched high from cycle 0
-/// - value > 0.0  →  latched high from cycle spike_time
+/// - value = 1.0  →  single spike at cycle 0
+/// - value > 0.0  →  single spike at cycle spike_time
 /// - value = 0.0  →  spike_time = SimulationLength → never fires
-///
-/// The latched signal lets downstream neurons continuously accumulate
-/// the input weight, so the membrane grows ∝ w_j · (t − t_j), tracking
-/// the analytical TTFS model's w_j · a_j.
 ///
 template <std::size_t InputSize, int SimulationLength>
 class TTFSSpikeGenerator
@@ -49,7 +47,7 @@ public:
                     std::llround(SimulationLength * (1.0 - clamped)));
 
                 return static_cast<spike_t>(
-                    spike_time < SimulationLength && cycle >= spike_time);
+                    spike_time < SimulationLength && cycle == spike_time);
             });
 
         return source;

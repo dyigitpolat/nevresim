@@ -1,8 +1,9 @@
 #pragma once
 
 #include "simulator/compute_policy/compute_policy_base.hpp"
+#include "simulator/compute_policy/compare_policy/inclusive_compare.hpp"
 
-namespace nevresim 
+namespace nevresim
 {
 
 /// Compute policy for TTFS quantized (cycle-based) mode.
@@ -16,13 +17,16 @@ namespace nevresim
 /// with hop-latency L becomes active at cycle ``L * S``.  This matches
 /// the Python-side ``for cycle in range(total_cycles)`` outer loop.
 ///
-/// Template parameter ``S`` is the number of discrete time steps.
+/// Template parameters: ``S`` is the number of discrete time steps;
+/// ``ComparePolicy`` is the config-driven firing comparator (strict ``<`` vs
+/// inclusive ``<=``), shared with the LIF / cascaded-TTFS fire policies.
 ///
-template <int S>
+template <int S, typename ComparePolicy = InclusiveCompare>
 class TTFSQuantizedCompute
 {
 public:
     using signal_t = double;
+    using compare_policy_t = ComparePolicy;
     static constexpr int time_steps = S;
 
     template <typename Chip>

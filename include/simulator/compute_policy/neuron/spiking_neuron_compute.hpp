@@ -26,12 +26,12 @@ class NeuronCompute<Config, SpikingCompute<FirePolicy>>
 
     constexpr void leaky_integrate(const auto& incoming_spikes)
     {
-        membrane_potential_ += 
+        membrane_potential_ +=
             std::inner_product(
                 std::cbegin(weights_), std::cend(weights_),
-                std::cbegin(incoming_spikes), 
+                std::cbegin(incoming_spikes),
                 static_cast<MembranePotential<weight_t>>(0))
-            + bias_ 
+            + bias_
             - Config::leak_amount_;
     }
 
@@ -47,9 +47,9 @@ public:
         leaky_integrate(incoming_signal);
         return fire();
     }
-    
-    constexpr 
-    void reset() 
+
+    constexpr
+    void reset()
     {
         membrane_potential_ = 0;
     }

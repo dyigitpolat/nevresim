@@ -23,7 +23,7 @@ public:
 
     template <typename ConcreteComputePolicy, typename Chip>
     constexpr static auto execute(
-        const auto& input, 
+        const auto& input,
         Chip& chip)
     {
         using weight_t = WeightType;
@@ -40,7 +40,7 @@ public:
             std::ranges::transform(
                 std::ranges::cbegin(out), std::ranges::cend(out),
                 std::ranges::cbegin(buffer), std::ranges::cend(buffer),
-                std::ranges::begin(buffer), 
+                std::ranges::begin(buffer),
                 std::plus{});
         }
 
