@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/types.hpp"
+#include "simulator/compute_policy/always_on_policy.hpp"
 
 namespace nevresim
 {
@@ -8,7 +9,7 @@ namespace nevresim
 template <typename ResetPolicy, typename ComparePolicy>
 struct LIFirePolicy
 {
-    static constexpr bool always_on_every_cycle = true;
+    using always_on_policy = EveryCycleAlwaysOn;
     static constexpr bool latency_gated = true;
 
     static constexpr spike_t fire(const auto& threshold, auto& membrane_potential)

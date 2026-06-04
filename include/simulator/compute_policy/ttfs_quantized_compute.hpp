@@ -31,7 +31,7 @@ public:
 
     template <typename Chip>
     using concrete_policy_t =
-        ComputePolicyBase<Chip, signal_t, true, true, S>;
+        ComputePolicyBase<Chip, signal_t, EveryCycleAlwaysOn, true, S>;
 };
 
 } // namespace nevresim

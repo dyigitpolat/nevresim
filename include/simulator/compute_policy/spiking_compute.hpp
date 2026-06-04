@@ -15,7 +15,7 @@ public:
 
     template <typename Chip>
     using concrete_policy_t = 
-        ComputePolicyBase<Chip, signal_t, FirePolicy::always_on_every_cycle, FirePolicy::latency_gated>;
+        ComputePolicyBase<Chip, signal_t, typename FirePolicy::always_on_policy, FirePolicy::latency_gated>;
 };
 
 } // namespace nevresim

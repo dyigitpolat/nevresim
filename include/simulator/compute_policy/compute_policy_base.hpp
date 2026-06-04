@@ -1,25 +1,29 @@
 #pragma once
 
 #include "simulator/chip_utilities.hpp"
+#include "simulator/compute_policy/always_on_policy.hpp"
 
 #include "common/constants.hpp"
 
-namespace nevresim 
+namespace nevresim
 {
 
 template <
-    typename Chip, 
-    typename SignalType, 
-    bool AlwaysOnEveryCycle = true,
+    typename Chip,
+    typename SignalType,
+    typename AlwaysOnPolicy = EveryCycleAlwaysOn,
     bool LatencyGated = true,
     int LatencyScale = 1>
 class ComputePolicyBase
 {
-private:
+public:
+    // Per-core assembled axon signals for a given cycle. Public so the
+    // spike-count recorder (NEVRESIM_RECORD_SPIKES) can mirror exactly what
+    // each core integrates, without duplicating the span-gather logic.
     static constexpr
     auto get_axon_input(
-        const Chip& chip, 
-        core_id_t core_id, 
+        const Chip& chip,
+        core_id_t core_id,
         const auto& input_buffer,
         [[maybe_unused]] int cycle = 0)
     {
@@ -42,19 +46,13 @@ private:
             }
             else if (span.core_ == k_always_on)
             {
-                if constexpr (AlwaysOnEveryCycle)
-                {
+                const int window_start =
+                    chip.get_cores()[core_id].get_latency() * LatencyScale;
+                if (AlwaysOnPolicy::delivers(cycle, window_start))
                     for (std::size_t i = 0; i < span.count_; ++i)
                         signals[dest++] = SignalType{1};
-                }
                 else
-                {
-                    if (cycle == 0)
-                        for (std::size_t i = 0; i < span.count_; ++i)
-                            signals[dest++] = SignalType{1};
-                    else
-                        dest += span.count_;
-                }
+                    dest += span.count_;
             }
             else
             {
@@ -81,10 +79,10 @@ private:
             return SignalType{};
         else if (source.core_ == k_always_on)
         {
-            if constexpr (AlwaysOnEveryCycle)
-                return SignalType{1};
-            else
-                return cycle == 0 ? SignalType{1} : SignalType{};
+            // An always-on read as a network output has window start 0
+            // (see TTFSCascadeExecution::win_start).
+            return AlwaysOnPolicy::delivers(cycle, /*window_start=*/0)
+                ? SignalType{1} : SignalType{};
         }
         return chip.get_cores()[source.core_]
                    .get_output()[source.neuron_];

@@ -3,6 +3,11 @@
 #include "simulator/compute_policy/spiking_compute.hpp"
 #include "simulator/compute_policy/fire_policy/default_fire.hpp"
 
+#ifdef NEVRESIM_RECORD_SPIKES
+#include "simulator/recording/spike_count_recorder.hpp"
+#include <iostream>
+#endif
+
 #include <algorithm>
 #include <cstddef>
 #include <functional>
@@ -29,12 +34,20 @@ public:
         using weight_t = WeightType;
 
         std::array<Weight<weight_t>, OutputSize> buffer{};
+#ifdef NEVRESIM_RECORD_SPIKES
+        auto recorder = make_spike_recorder<Chip>();
+#endif
         for(int i = 0; i < SimulationLength + Latency; ++i){
             const auto& spikes{
                 SpikeProvider<(Chip::config_).input_size_, SimulationLength>
                     ::generate_spikes(input, i)};
 
             ConcreteComputePolicy::compute(chip, spikes, i);
+
+#ifdef NEVRESIM_RECORD_SPIKES
+            recorder->template accumulate<ConcreteComputePolicy>(
+                chip, spikes, i, SimulationLength, /*lat_scale=*/1, /*latched=*/false);
+#endif
 
             auto&& out{ConcreteComputePolicy::read_output_buffer(chip, spikes, i)};
             std::ranges::transform(
@@ -44,6 +57,9 @@ public:
                 std::plus{});
         }
 
+#ifdef NEVRESIM_RECORD_SPIKES
+        recorder->dump(std::cerr);
+#endif
         return buffer;
     }
 };

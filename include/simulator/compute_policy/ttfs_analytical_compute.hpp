@@ -8,7 +8,7 @@ namespace nevresim
 /// Compute policy for the continuous (analytical) TTFS forward pass.
 ///
 /// Semantically identical to ``RealValuedCompute`` at the policy level
-/// (real-valued signals, ``AlwaysOnEveryCycle=true``, ``LatencyGated=true``),
+/// (real-valued signals, ``EveryCycleAlwaysOn``, ``LatencyGated=true``),
 /// but typed as a distinct class so that ``NeuronCompute`` can be specialised
 /// to divide by the per-neuron threshold — giving the analytical TTFS
 /// ``relu(W @ x + b) / θ`` behaviour.

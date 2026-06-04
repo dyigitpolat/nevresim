@@ -18,8 +18,8 @@ namespace nevresim
 /// neuron's bias/ramp start at its reference time (no premature firing) and it
 /// fires within its window ``[L, L+S)`` — the genuine TTFS value is then decoded
 /// per-source as ``(L + S - fire)/S`` by ``TTFSCascadeExecution``. An always-on
-/// (bias) axon encodes value 1.0 as a single spike at cycle 0
-/// (``always_on_every_cycle = false``).
+/// (bias) axon encodes value 1.0 as a single spike at the consuming core's local
+/// window start (``WindowStartAlwaysOn``), ramped downstream.
 ///
 /// ``ComparePolicy`` is the config-driven firing comparator (strict ``<`` vs
 /// inclusive ``<=``), shared with the LIF / quantized-TTFS fire decisions.
@@ -32,7 +32,7 @@ public:
 
     template <typename Chip>
     using concrete_policy_t =
-        ComputePolicyBase<Chip, signal_t, /*AlwaysOnEveryCycle=*/false,
+        ComputePolicyBase<Chip, signal_t, WindowStartAlwaysOn,
                           /*LatencyGated=*/true>;
 };
 
