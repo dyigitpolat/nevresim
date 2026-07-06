@@ -4,6 +4,7 @@
 #include "simulator/chip_weights.hpp"
 #include "common/types.hpp"
 
+#include <algorithm>
 #include <numeric>
 
 namespace nevresim {
@@ -11,13 +12,16 @@ namespace nevresim {
 template <typename Config, typename ComputePolicy>
 class NeuronCompute;
 
-/// TTFS analytical neuron: ``relu(Σ w_j · x_j + bias) / threshold``.
+/// TTFS analytical neuron: ``clip(relu(Σ w_j · x_j + bias) / threshold, 0, 1)``.
 ///
 /// This is the stateless, single-pass neuron used by the continuous
 /// (event-based) TTFS deployment.  It is identical to the real-valued
 /// neuron except for the final division by ``threshold_``, which
 /// normalises activations back into [0, 1] (matching the trained
-/// ReLU network's scale).
+/// ReLU network's scale).  The upper clamp is the wire contract shared
+/// with the trained clamp(ReLU) forward and the framework's soft-core
+/// reference (``clip(relu(V)/theta, 0, 1)``); omitting it leaks
+/// unclamped values across cores.
 template <typename Config>
 class NeuronCompute<Config, TTFSAnalyticalCompute>
 {
@@ -44,8 +48,10 @@ public:
         auto activated = std::max(signal_t{0}, sum);
 
         // Divide by threshold (= parameter_scale) to recover the original
-        // floating-point activation magnitude.
-        return activated / static_cast<signal_t>(threshold_);
+        // floating-point activation magnitude, clamped to the trained
+        // activation ceiling (theta) exactly like the torch kernel.
+        return std::min(
+            signal_t{1}, activated / static_cast<signal_t>(threshold_));
     }
 
     constexpr void reset() {}
