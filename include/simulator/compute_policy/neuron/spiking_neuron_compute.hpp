@@ -54,6 +54,19 @@ public:
         membrane_potential_ = 0;
     }
 
+    // Final-membrane read port (Q_T = theta*c_T + m_T decode support).
+    constexpr
+    MembranePotential<weight_t> get_membrane_potential() const
+    {
+        return membrane_potential_;
+    }
+
+    constexpr
+    threshold_t get_threshold() const
+    {
+        return threshold_;
+    }
+
     constexpr
     void load_weights(
         const NeuronWeights<Config{}, typename Config::weight_t, typename Config::threshold_t>& weights)

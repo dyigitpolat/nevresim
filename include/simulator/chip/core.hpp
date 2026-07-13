@@ -55,6 +55,19 @@ public:
         return latency_;
     }
 
+    // Per-neuron read ports for the final-membrane export (spiking policies).
+    constexpr
+    auto get_neuron_membrane(std::size_t neuron_idx) const
+    {
+        return neurons_[neuron_idx].get_membrane_potential();
+    }
+
+    constexpr
+    auto get_neuron_threshold(std::size_t neuron_idx) const
+    {
+        return neurons_[neuron_idx].get_threshold();
+    }
+
     constexpr
     void reset()
     {

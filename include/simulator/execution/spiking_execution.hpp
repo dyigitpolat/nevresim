@@ -8,6 +8,12 @@
 #include <iostream>
 #endif
 
+#ifdef NEVRESIM_EXPORT_MEMBRANE
+#include "simulator/recording/final_membrane_reader.hpp"
+#include <iostream>
+#include <type_traits>
+#endif
+
 #include <algorithm>
 #include <cstddef>
 #include <functional>
@@ -37,6 +43,9 @@ public:
 #ifdef NEVRESIM_RECORD_SPIKES
         auto recorder = make_spike_recorder<Chip>();
 #endif
+#ifdef NEVRESIM_EXPORT_MEMBRANE
+        FinalMembraneReader<Chip, SimulationLength> membrane_reader{};
+#endif
         for(int i = 0; i < SimulationLength + Latency; ++i){
             const auto& spikes{
                 SpikeProvider<(Chip::config_).input_size_, SimulationLength>
@@ -49,6 +58,10 @@ public:
                 chip, spikes, i, SimulationLength, /*lat_scale=*/1, /*latched=*/false);
 #endif
 
+#ifdef NEVRESIM_EXPORT_MEMBRANE
+            membrane_reader.capture(chip, i);
+#endif
+
             auto&& out{ConcreteComputePolicy::read_output_buffer(chip, spikes, i)};
             std::ranges::transform(
                 std::ranges::cbegin(out), std::ranges::cend(out),
@@ -59,6 +72,15 @@ public:
 
 #ifdef NEVRESIM_RECORD_SPIKES
         recorder->dump(std::cerr);
+#endif
+
+#ifdef NEVRESIM_EXPORT_MEMBRANE
+        // The compile-time chip's constexpr self-tests reach here too; the
+        // stderr dump is runtime-only.
+        if (!std::is_constant_evaluated())
+        {
+            membrane_reader.dump(std::cerr);
+        }
 #endif
         return buffer;
     }
