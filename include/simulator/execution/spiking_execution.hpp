@@ -8,6 +8,11 @@
 #include <iostream>
 #endif
 
+#ifdef NEVRESIM_RECORD_SPIKE_TRAINS
+#include "simulator/recording/spike_train_recorder.hpp"
+#include <iostream>
+#endif
+
 #ifdef NEVRESIM_EXPORT_MEMBRANE
 #include "simulator/recording/final_membrane_reader.hpp"
 #include <iostream>
@@ -43,6 +48,10 @@ public:
 #ifdef NEVRESIM_RECORD_SPIKES
         auto recorder = make_spike_recorder<Chip>();
 #endif
+#ifdef NEVRESIM_RECORD_SPIKE_TRAINS
+        auto train_recorder =
+            make_spike_train_recorder<Chip, SimulationLength>();
+#endif
 #ifdef NEVRESIM_EXPORT_MEMBRANE
         FinalMembraneReader<Chip, SimulationLength> membrane_reader{};
 #endif
@@ -56,6 +65,9 @@ public:
 #ifdef NEVRESIM_RECORD_SPIKES
             recorder->template accumulate<ConcreteComputePolicy>(
                 chip, spikes, i, SimulationLength, /*lat_scale=*/1, /*latched=*/false);
+#endif
+#ifdef NEVRESIM_RECORD_SPIKE_TRAINS
+            train_recorder->accumulate(chip, i, /*lat_scale=*/1);
 #endif
 
 #ifdef NEVRESIM_EXPORT_MEMBRANE
@@ -72,6 +84,9 @@ public:
 
 #ifdef NEVRESIM_RECORD_SPIKES
         recorder->dump(std::cerr);
+#endif
+#ifdef NEVRESIM_RECORD_SPIKE_TRAINS
+        train_recorder->dump(std::cerr);
 #endif
 
 #ifdef NEVRESIM_EXPORT_MEMBRANE
