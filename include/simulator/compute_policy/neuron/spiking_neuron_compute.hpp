@@ -5,47 +5,37 @@
 #include "simulator/chip_weights.hpp"
 #include "common/types.hpp"
 
-#include <numeric>
-
 namespace nevresim {
 
 template <typename Config, typename ComputePolicy>
 class NeuronCompute;
 
-template <typename Config, typename FirePolicy>
-class NeuronCompute<Config, SpikingCompute<FirePolicy>>
+template <typename Config, typename FirePolicy, typename IntegrationPolicy>
+class NeuronCompute<Config, SpikingCompute<FirePolicy, IntegrationPolicy>>
 {
     using weight_t = typename Config::weight_t;
     using threshold_t = typename Config::threshold_t;
     using weights_array_t = std::array<Weight<weight_t>, Config::axon_count_>;
+    // The membrane type is OWNED by the integration policy: a per-cycle law
+    // holds the unbounded accumulator this neuron always held, and a
+    // fixed-width saturating law holds its own register. One declaration site.
+    using membrane_t = typename IntegrationPolicy::template membrane_t<weight_t>;
 
     weights_array_t weights_{};
     Bias<weight_t> bias_{};
     threshold_t threshold_{};
-    MembranePotential<weight_t> membrane_potential_{};
-
-    constexpr void leaky_integrate(const auto& incoming_spikes)
-    {
-        membrane_potential_ +=
-            std::inner_product(
-                std::cbegin(weights_), std::cend(weights_),
-                std::cbegin(incoming_spikes),
-                static_cast<MembranePotential<weight_t>>(0))
-            + bias_
-            - Config::leak_amount_;
-    }
-
-    constexpr spike_t fire()
-    {
-        return FirePolicy::fire(threshold_, membrane_potential_);
-    }
+    membrane_t membrane_potential_{};
 
 public:
-    constexpr typename SpikingCompute<FirePolicy>::signal_t
+    constexpr typename SpikingCompute<FirePolicy, IntegrationPolicy>::signal_t
     operator()(const auto& incoming_signal)
     {
-        leaky_integrate(incoming_signal);
-        return fire();
+        // Integrate AND fire are one step: a per-event law interleaves them by
+        // construction, and a per-cycle law is the degenerate case where the
+        // whole contribution is reduced before the single compare.
+        return IntegrationPolicy::template step<FirePolicy>(
+            weights_, incoming_signal, bias_, Config::leak_amount_,
+            threshold_, membrane_potential_);
     }
 
     constexpr
@@ -56,7 +46,7 @@ public:
 
     // Final-membrane read port (Q_T = theta*c_T + m_T decode support).
     constexpr
-    MembranePotential<weight_t> get_membrane_potential() const
+    membrane_t get_membrane_potential() const
     {
         return membrane_potential_;
     }

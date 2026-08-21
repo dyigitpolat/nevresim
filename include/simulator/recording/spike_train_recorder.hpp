@@ -12,6 +12,16 @@
 // SANA-FE's _compute_seg_output_raster). Emitted to stderr as its own record
 // line — `SPKTRN <core> <bits per neuron...>` then `SPKTRN_END` — so the
 // existing SPKREC parser is untouched.
+//
+// TWO wire versions, chosen by the LAW and not by the build flag:
+//   SPKTRN  <core> <bitstring per neuron>            one char per cycle, 0/1
+//   SPKTRN2 <core> <c,c,c,... per neuron>            one comma-joined count
+//                                                     list per cycle
+// A per-cycle law can emit at most one spike per neuron, so its raster IS a bit
+// raster and stays byte-identical. A per-event law can emit several, and a bit
+// raster would silently destroy the multiplicity the law exists to produce —
+// so it versions the line instead. Both close a sample with `SPKTRN_END`, so
+// the sample framing has exactly one spelling.
 
 #ifdef NEVRESIM_RECORD_SPIKE_TRAINS
 
@@ -25,7 +35,7 @@
 
 namespace nevresim {
 
-template <typename Chip, int SimulationLength>
+template <typename Chip, int SimulationLength, bool Counted = false>
 struct SpikeTrainRecorder
 {
     static constexpr std::size_t core_count = Chip::config_.core_count_;
@@ -55,8 +65,13 @@ struct SpikeTrainRecorder
 
             const auto& output = chip.get_cores()[c].get_output();
             for (std::size_t n = 0; n < neuron_count; ++n)
-                out_[c][n][local] =
-                    static_cast<long>(output[n]) != 0 ? 1 : 0;
+            {
+                const long emitted = static_cast<long>(output[n]);
+                if constexpr (Counted)
+                    out_[c][n][local] = static_cast<std::uint8_t>(emitted);
+                else
+                    out_[c][n][local] = emitted != 0 ? 1 : 0;
+            }
         }
     }
 
@@ -64,12 +79,22 @@ struct SpikeTrainRecorder
     {
         for (std::size_t c = 0; c < core_count; ++c)
         {
-            os << "SPKTRN " << c;
+            os << (Counted ? "SPKTRN2 " : "SPKTRN ") << c;
             for (std::size_t n = 0; n < neuron_count; ++n)
             {
                 os << ' ';
                 for (int t = 0; t < SimulationLength; ++t)
-                    os << static_cast<char>('0' + out_[c][n][t]);
+                {
+                    if constexpr (Counted)
+                    {
+                        if (t) os << ',';
+                        os << static_cast<int>(out_[c][n][t]);
+                    }
+                    else
+                    {
+                        os << static_cast<char>('0' + out_[c][n][t]);
+                    }
+                }
             }
             os << '\n';
         }
@@ -77,11 +102,12 @@ struct SpikeTrainRecorder
     }
 };
 
-template <typename Chip, int SimulationLength>
-inline std::unique_ptr<SpikeTrainRecorder<Chip, SimulationLength>>
+template <typename Chip, int SimulationLength, bool Counted = false>
+inline std::unique_ptr<SpikeTrainRecorder<Chip, SimulationLength, Counted>>
 make_spike_train_recorder()
 {
-    return std::make_unique<SpikeTrainRecorder<Chip, SimulationLength>>();
+    return std::make_unique<
+        SpikeTrainRecorder<Chip, SimulationLength, Counted>>();
 }
 
 } // namespace nevresim

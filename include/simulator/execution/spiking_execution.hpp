@@ -31,11 +31,12 @@ template <
     std::size_t OutputSize,
     template<auto... Args> class SpikeProvider,
     typename WeightType,
-    typename FirePolicy = DefaultFirePolicy>
+    typename FirePolicy = DefaultFirePolicy,
+    typename IntegrationPolicy = WholeVectorIntegrate>
 class SpikingExecution
 {
 public:
-    using compute_policy_t = SpikingCompute<FirePolicy>;
+    using compute_policy_t = SpikingCompute<FirePolicy, IntegrationPolicy>;
 
     template <typename ConcreteComputePolicy, typename Chip>
     constexpr static auto execute(
@@ -49,8 +50,12 @@ public:
         auto recorder = make_spike_recorder<Chip>();
 #endif
 #ifdef NEVRESIM_RECORD_SPIKE_TRAINS
+        // The raster's alphabet follows the LAW, not the build flag: a law
+        // that can emit twice in one cycle records COUNTS, everything else
+        // records the bit raster it always did.
         auto train_recorder =
-            make_spike_train_recorder<Chip, SimulationLength>();
+            make_spike_train_recorder<
+                Chip, SimulationLength, IntegrationPolicy::counted_wire>();
 #endif
 #ifdef NEVRESIM_EXPORT_MEMBRANE
         FinalMembraneReader<Chip, SimulationLength> membrane_reader{};
