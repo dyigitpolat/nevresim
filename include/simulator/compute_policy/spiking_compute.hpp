@@ -2,11 +2,12 @@
 
 #include "simulator/compute_policy/compute_policy_base.hpp"
 #include "simulator/compute_policy/fire_policy/default_fire.hpp"
-// Both integration policies ride the compute policy's own header, so a
+// Every integration policy rides the compute policy's own header, so a
 // generated main.cpp that names one needs NO new #include line and the emitted
 // text of every default-point program stays byte-identical.
 #include "simulator/compute_policy/integration_policy/event_serial_integrate.hpp"
 #include "simulator/compute_policy/integration_policy/whole_vector_integrate.hpp"
+#include "simulator/compute_policy/integration_policy/whole_vector_saturating_signed.hpp"
 
 namespace nevresim
 {

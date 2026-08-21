@@ -15,6 +15,7 @@
 #include "common/types.hpp"
 
 #include <cstddef>
+#include <iterator>
 #include <numeric>
 
 namespace nevresim
