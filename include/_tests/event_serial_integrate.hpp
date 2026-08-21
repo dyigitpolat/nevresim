@@ -44,11 +44,16 @@ constexpr bool test_event_serial_counts_every_crossing()
 
 /// Ascending slot order with each slot's multiplicity ADJACENT: the second
 /// occurrence of slot 0 crosses before slot 1's inhibition arrives.
+///
+/// SIGN-ASYMMETRIC on purpose (plan sec.2.3): +3 +3 -3 reaches 6 >= 5 and
+/// emits 1, while the round-robin order +3 -3 +3 never leaves 3 and emits 0.
+/// A symmetric witness (e.g. w={3,-1}) answers 1 under BOTH orders, so it
+/// cannot separate them and an interleaving executor would compile clean.
 constexpr bool test_event_serial_order_is_ascending_and_adjacent()
 {
     const auto [emitted, membrane] =
-        serial_fold<8>(std::array<int, 2>{3, -1},
-                       std::array<spike_t, 2>{2, 1}, 4);
+        serial_fold<8>(std::array<int, 2>{3, -3},
+                       std::array<spike_t, 2>{2, 1}, 5);
     return emitted == 1 && membrane == 0;
 }
 
