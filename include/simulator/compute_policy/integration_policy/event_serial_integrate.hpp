@@ -25,9 +25,9 @@
 //     no plumbing for.
 //   * event multiplicities are non-negative. A negative arrival is a sign
 //     folded into the wire instead of the weight.
-//   * the emitted count fits the count currency (127). It is refused, NEVER
-//     wrapped: ``spike_t`` is ``int_fast8_t`` and a silent saturation there is
-//     exactly the failure the count currency exists to make impossible.
+//   * the emitted count fits THIS chip's count currency. It is refused, NEVER
+//     wrapped: a silent saturation there is exactly the failure the count
+//     currency exists to make impossible.
 
 #include "common/types.hpp"
 
@@ -36,10 +36,6 @@
 
 namespace nevresim
 {
-
-/// The count-currency ceiling: one window/cycle count travels as one
-/// ``spike_t``, and every implementation of the serial fold shares this bound.
-inline constexpr int k_emitted_spike_ceiling = 127;
 
 template <unsigned MembraneBits>
 struct EventSerialIntegrate
@@ -50,6 +46,12 @@ struct EventSerialIntegrate
         "membrane type the chip is generated with");
 
     static constexpr unsigned membrane_bits = MembraneBits;
+
+    /// This chip's count currency, from its own declared width — NOT a
+    /// universal constant. A chip whose registers are 8 bits wide carries 127
+    /// per cycle; one that declares 16 carries what a signed 16-bit word holds.
+    static constexpr int emitted_spike_ceiling =
+        count_currency_ceiling(MembraneBits);
 
     /// The saturating unsigned register's value range. The C++ storage type
     /// stays the weight's own type (see ``membrane_t``); the RANGE is what the
@@ -140,13 +142,14 @@ struct EventSerialIntegrate
             }
         }
 
-        if (emitted > k_emitted_spike_ceiling)
+        if (emitted > emitted_spike_ceiling)
         {
             throw std::logic_error(
                 "EventSerialIntegrate: a neuron emitted more spikes in ONE "
-                "cycle than the count currency carries (127) — refused, never "
-                "clamped, because a clamp reports a number the deployment "
-                "cannot produce; lower the fan-in or raise theta");
+                "cycle than THIS chip's count currency carries — refused, "
+                "never clamped, because a clamp reports a number the "
+                "deployment cannot produce; lower the fan-in, raise theta, or "
+                "deploy a chip that declares a wider register");
         }
         return static_cast<spike_t>(emitted);
     }

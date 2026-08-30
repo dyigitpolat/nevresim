@@ -71,6 +71,29 @@ constexpr bool test_event_serial_membrane_saturates_both_rails()
         && high_emitted == 0 && high_membrane == 7;
 }
 
+/// The COUNT CURRENCY is the chip's own declared width, not a universal 127.
+/// A chip narrower than a byte still gets the byte's currency, and no chip gets
+/// more than one ``spike_t`` holds.
+constexpr bool test_the_count_currency_is_the_chips_own_width()
+{
+    return EventSerialIntegrate<8>::emitted_spike_ceiling == 127
+        && EventSerialIntegrate<3>::emitted_spike_ceiling == 127
+        && EventSerialIntegrate<16>::emitted_spike_ceiling == 32767
+        && EventSerialIntegrate<30>::emitted_spike_ceiling == 32767;
+}
+
+/// A 16-bit chip carries a count the 8-bit currency refuses: 200 occurrences of
+/// a slot at theta emit 200 spikes in ONE cycle, unclamped. The same fold under
+/// ``EventSerialIntegrate<8>`` would refuse this at 127.
+constexpr bool test_event_serial_carries_a_count_over_the_stock_currency()
+{
+    const auto [emitted, membrane] =
+        serial_fold<16>(std::array<int, 1>{100},
+                        std::array<spike_t, 1>{200}, 100);
+    return emitted == 200 && membrane == 0
+        && emitted > EventSerialIntegrate<8>::emitted_spike_ceiling;
+}
+
 /// The default policy is the degenerate case: one reduction, one compare, at
 /// most one spike — the arithmetic every pre-axes program executed.
 constexpr bool test_whole_vector_integrate_fires_once_per_cycle()
@@ -89,6 +112,8 @@ constexpr bool test_event_serial_integrate()
     return test_event_serial_counts_every_crossing()
         && test_event_serial_order_is_ascending_and_adjacent()
         && test_event_serial_membrane_saturates_both_rails()
+        && test_the_count_currency_is_the_chips_own_width()
+        && test_event_serial_carries_a_count_over_the_stock_currency()
         && test_whole_vector_integrate_fires_once_per_cycle();
 }
 

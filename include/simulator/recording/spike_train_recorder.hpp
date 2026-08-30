@@ -41,8 +41,10 @@ struct SpikeTrainRecorder
     static constexpr std::size_t core_count = Chip::config_.core_count_;
     static constexpr std::size_t neuron_count = Chip::config_.neuron_count_;
 
+    /// The raster holds the COUNT CURRENCY's own word, so a counted train
+    /// records what the fold emitted rather than what a byte happens to hold.
     std::array<
-        std::array<std::array<std::uint8_t, SimulationLength>, neuron_count>,
+        std::array<std::array<spike_t, SimulationLength>, neuron_count>,
         core_count> out_{};
 
     void clear()
@@ -68,7 +70,7 @@ struct SpikeTrainRecorder
             {
                 const long emitted = static_cast<long>(output[n]);
                 if constexpr (Counted)
-                    out_[c][n][local] = static_cast<std::uint8_t>(emitted);
+                    out_[c][n][local] = static_cast<spike_t>(emitted);
                 else
                     out_[c][n][local] = emitted != 0 ? 1 : 0;
             }
