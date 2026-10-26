@@ -2,6 +2,7 @@
 
 #include "simulator/compute_policy/spiking_compute.hpp"
 #include "simulator/compute_policy/fire_policy/default_fire.hpp"
+#include "simulator/spike_generation/stage_input_train.hpp"
 
 #ifdef NEVRESIM_RECORD_SPIKES
 #include "simulator/recording/spike_count_recorder.hpp"
@@ -55,11 +56,11 @@ public:
 #ifdef NEVRESIM_EXPORT_MEMBRANE
         FinalMembraneReader<Chip, SimulationLength> membrane_reader{};
 #endif
+        // Every core reads the stage input in its own local time.
+        const StageInputTrain<
+            (Chip::config_).input_size_, SimulationLength, SpikeProvider>
+            spikes{input};
         for(int i = 0; i < SimulationLength + Latency; ++i){
-            const auto& spikes{
-                SpikeProvider<(Chip::config_).input_size_, SimulationLength>
-                    ::generate_spikes(input, i)};
-
             ConcreteComputePolicy::compute(chip, spikes, i);
 
 #ifdef NEVRESIM_RECORD_SPIKES

@@ -3,6 +3,7 @@
 #include "simulator/compute_policy/ttfs_quantized_compute.hpp"
 #include "simulator/compute_policy/ttfs_cascade_compute.hpp"
 #include "simulator/compute_policy/compare_policy/inclusive_compare.hpp"
+#include "simulator/spike_generation/stage_input_train.hpp"
 #include "common/types.hpp"
 #include "common/constants.hpp"
 
@@ -92,12 +93,12 @@ public:
 
         std::array<Weight<weight_t>, OutputSize> buffer{};
         std::array<spike_t, OutputSize> out_latched{};
+        // Every core reads the stage input in its own local time.
+        const StageInputTrain<
+            (Chip::config_).input_size_, SimulationLength, SpikeProvider>
+            spikes{input};
         for (int i = 0; i < SimulationLength + Latency; ++i)
         {
-            const auto& spikes{
-                SpikeProvider<(Chip::config_).input_size_, SimulationLength>
-                    ::generate_spikes(input, i)};
-
             ConcreteComputePolicy::compute(chip, spikes, i);
 
             auto&& out{ConcreteComputePolicy::read_output_buffer(chip, spikes, i)};

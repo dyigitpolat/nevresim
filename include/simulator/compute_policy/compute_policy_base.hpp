@@ -2,6 +2,7 @@
 
 #include "simulator/chip_utilities.hpp"
 #include "simulator/compute_policy/always_on_policy.hpp"
+#include "simulator/spike_generation/stage_input_train.hpp"
 
 #include "common/constants.hpp"
 
@@ -41,8 +42,12 @@ public:
             }
             else if (span.core_ == k_input_buffer_id)
             {
+                // The stage input in the core's local time (stage_input_train.hpp).
+                const int local_cycle = cycle
+                    - chip.get_cores()[core_id].get_latency() * LatencyScale;
                 for (std::size_t i = 0; i < span.count_; ++i)
-                    signals[dest++] = input_buffer[span.start_ + i];
+                    signals[dest++] = read_stage_input(
+                        input_buffer, span.start_ + i, local_cycle);
             }
             else if (span.core_ == k_always_on)
             {
@@ -74,7 +79,8 @@ public:
         [[maybe_unused]] int cycle = 0)
     {
         if (source.core_ == k_input_buffer_id)
-            return input_buffer[source.neuron_];
+            // A network output read off the stage input: window start 0.
+            return read_stage_input(input_buffer, source.neuron_, cycle);
         else if (source.core_ == k_no_connection)
             return SignalType{};
         else if (source.core_ == k_always_on)
