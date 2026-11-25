@@ -1,6 +1,7 @@
 #pragma once
 
 #include "simulator/compute_policy/ttfs_quantized_compute.hpp"
+#include "simulator/compute_policy/timing_decision.hpp"
 #include "simulator/chip_weights.hpp"
 #include "common/types.hpp"
 
@@ -16,10 +17,15 @@ class NeuronCompute;
 ///
 /// Called once per active cycle by ``Core::compute``.
 ///
-///   First call  (Phase 1):  V = Σ w_j · a_j + bias   (initial charge)
-///   Each  call  (Phase 2):  if V ≥ θ  → latch output (S − k) / S
-///                           V += θ / S                (constant ramp)
+///   First call  (Phase 1):  V = Σ w_j · a_j + bias   (initial charge), and the
+///                           fire step k taken once by ``timing::fire_step``
+///   Each  call  (Phase 2):  at step k → latch output (S − k) / S
 ///   After S calls:          return cached output
+///
+/// The decision is the one timing decision (``timing_decision.hpp``): on the
+/// integer chip's lattice the first step with V + k θ/S reaching θ, decided in
+/// integers (the Python executor's rule); every other neuron by the ramp
+/// V += θ/S compared with the config-driven comparator, as before.
 ///
 /// The neuron fires **at most once**; after that, the output is latched.
 /// ``reset()`` must be called between input samples.
@@ -35,42 +41,46 @@ class NeuronCompute<Config, TTFSQuantizedCompute<S, ComparePolicy>>
     weights_array_t weights_{};
     Bias<weight_t> bias_{};
     threshold_t threshold_{1};
+    timing::LatticeNeuron lattice_{};  // the lattice reading's constants, taken when the parameters load
 
     // --- Per-sample state (cleared by reset()) ---
-    signal_t membrane_potential_{0};
     signal_t output_{0};
     bool initialized_{false};
-    bool has_fired_{false};
+    int fire_step_{-1};
     int steps_taken_{0};
 
 public:
     constexpr signal_t
     operator()(const auto& incoming_signal)
     {
-        // Phase 1: first active cycle — compute initial charge.
+        // Phase 1: first active cycle — the membrane (on the lattice, or the
+        // initial charge V = Σ w_j · a_j + bias) and the fire step.
         if (!initialized_)
         {
-            membrane_potential_ = std::inner_product(
-                std::cbegin(weights_), std::cend(weights_),
-                std::cbegin(incoming_signal),
-                signal_t{0}
-            ) + bias_;
+            const signal_t theta = static_cast<signal_t>(threshold_);
+            timing::Membrane membrane = timing::lattice_membrane(lattice_, weights_, incoming_signal, S);
+            if (!membrane.lattice)
+            {
+                membrane.v = std::inner_product(
+                    std::cbegin(weights_), std::cend(weights_),
+                    std::cbegin(incoming_signal),
+                    signal_t{0}
+                ) + bias_;
+            }
+            fire_step_ = timing::fire_step(
+                membrane, theta, S, timing::strict_compare<ComparePolicy>(), timing::FloatPath::ramp);
             initialized_ = true;
         }
 
         // All S steps already done — return cached output.
         if (steps_taken_ >= S) return output_;
 
-        const signal_t theta = static_cast<signal_t>(threshold_);
-
-        // Phase 2: fire-once check (config-driven comparator) + constant ramp.
-        if (!has_fired_ && ComparePolicy::fires(theta, membrane_potential_))
+        // Phase 2: the output latches at the fire step.
+        if (steps_taken_ == fire_step_)
         {
-            output_ = static_cast<signal_t>(S - steps_taken_) / S;
-            has_fired_ = true;
+            output_ = static_cast<signal_t>(timing::level(S, fire_step_));
         }
 
-        membrane_potential_ += theta / S;
         ++steps_taken_;
 
         return output_;
@@ -78,10 +88,9 @@ public:
 
     constexpr void reset()
     {
-        membrane_potential_ = 0;
         output_ = 0;
         initialized_ = false;
-        has_fired_ = false;
+        fire_step_ = -1;
         steps_taken_ = 0;
     }
 
@@ -92,6 +101,8 @@ public:
         weights_ = weights.weights_;
         bias_ = weights.bias_;
         threshold_ = weights.threshold_;
+        lattice_ = timing::lattice_neuron(
+            weights_, static_cast<double>(bias_), static_cast<double>(threshold_), S);
     }
 };
 
